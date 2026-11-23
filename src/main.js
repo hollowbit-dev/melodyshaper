@@ -201,6 +201,6 @@ app.on('second-instance', (e, argv) => {
   const f = argv.find((a) => a.toLowerCase().endsWith('.melody'));
   if (f) readSong(f).then((song) => send('open-song', song)).catch(() => {});
 });
-app.whenReady().then(() => { serve(); menu(); create(); });
+app.whenReady().then(() => { serve(); menu(); require('./discord-menu').addDiscordMenu(); create(); });
 app.on('activate', () => { if (!win) create(); });
 app.on('window-all-closed', () => { if (!IS_MAC) app.quit(); });

@@ -1,5 +1,6 @@
 import assert from 'node:assert';
-import { METERS, SCALES, BEATS, PROGRESSIONS, beatHits, beatsFor, bassFromChords, chordNotes, degToMidi, fitChords, nearestDeg, notesForChords, rowCount, stepSeconds } from '../src/renderer/theory.mjs';
+import { beatGroups } from '../src/renderer/beats.mjs';
+import { METERS, SCALES, BEATS, PROGRESSIONS, beatHits, beatsFor, bassFromChords, chordNotes, degToMidi, fitChords, makeMelody, MELODY_STYLES, nearestDeg, notesForChords, rowCount, stepSeconds } from '../src/renderer/theory.mjs';
 
 for (const scale of Object.keys(SCALES)) {
   for (let key = 0; key < 12; key++) {
@@ -49,6 +50,35 @@ for (const scale of Object.keys(SCALES)) for (const meter of Object.keys(METERS)
     assert(notesForChords(f.degrees, meter).every((n) => n.deg >= 0 && n.deg < rowCount(scale) && n.step + n.len <= bars * size), `${scale} ${meter}: chord off the grid`);
   }
 }
+// Drum presets: every bar fills its time signature, ids are unique, and every sound exists.
+const soundIds = new Set(JSON.parse((await import('node:fs')).readFileSync(new URL('../src/renderer/samples/manifest.json', import.meta.url), 'utf8')).drums.map((d) => d.id));
+const ids = new Set();
+let presets = 0;
+for (const [meter, m] of Object.entries(METERS)) for (const g of beatGroups(meter, beatsFor(meter))) for (const b of g.beats) {
+  presets++;
+  assert(!ids.has(`${meter}:${b.id}`), `Duplicate preset ${b.id}`); ids.add(`${meter}:${b.id}`);
+  for (const [drum, p] of Object.entries(b.hits)) { assert.equal(p.length, m.barSteps, `${meter} ${b.id} ${drum}: length ${p.length}`); assert(soundIds.has(drum), `${b.id}: no sound ${drum}`); assert(/^[x.]+$/.test(p)); }
+}
+assert(presets >= 100, `Only ${presets} drum presets`);
+
+// Melody maker: in range, inside the song, no overlaps, strong beats on chord notes, repeatable, and varied.
+for (const scale of Object.keys(SCALES)) for (const meter of Object.keys(METERS)) for (const bars of [4, 8, 16]) for (const style of MELODY_STYLES) for (const kind of ['chords', 'bass']) for (const seed of [1, 2, 3]) {
+  const m = METERS[meter], n = SCALES[scale].steps.length, source = kind === 'chords' ? chordNotes(PROGRESSIONS[0], scale, bars * m.barSteps, meter) : bassFromChords(chordNotes(PROGRESSIONS[0], scale, bars * m.barSteps, meter), scale, meter);
+  const tune = makeMelody(source, { kind, scale, meter, bars, style: style.id, seed });
+  assert(tune.length >= bars, `${scale} ${meter} ${style.id}: too few notes`);
+  assert.deepEqual(makeMelody(source, { kind, scale, meter, bars, style: style.id, seed }), tune, 'Same seed must give the same melody');
+  tune.forEach((x, i) => {
+    assert(Number.isInteger(x.deg) && x.deg >= 0 && x.deg < rowCount(scale), `${scale} ${meter}: note off the grid`);
+    assert(x.len > 0 && x.step + x.len <= bars * m.barSteps, `${scale} ${meter}: note past the end`);
+    if (i) assert(tune[i - 1].step + tune[i - 1].len <= x.step, `${scale} ${meter} ${style.id}: notes overlap`);
+    if (x.step % m.barSteps === 0) {
+      const bar = x.step / m.barSteps, root = PROGRESSIONS[0].degrees[bar % 4] % n, tones = [0, 2, 4].map((o) => (root + o) % n);
+      assert(tones.includes(x.deg % n), `${scale} ${meter} ${style.id}: bar ${bar} doesn't start on a chord note`);
+    }
+  });
+}
+const seedA = makeMelody(chordNotes(PROGRESSIONS[0], 'major', 64), { scale: 'major', bars: 4, seed: 1 }), seedB = makeMelody(chordNotes(PROGRESSIONS[0], 'major', 64), { scale: 'major', bars: 4, seed: 2 });
+assert.notDeepEqual(seedA, seedB, 'Another try should give a different melody');
 assert.equal(stepSeconds(120, '4/4'), 0.125);
 assert.equal(stepSeconds(120, '6/8'), 60 / 120 / 6);
 console.log('theory: every note in every key stays in key');

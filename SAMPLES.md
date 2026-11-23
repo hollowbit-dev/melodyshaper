@@ -1,6 +1,6 @@
 # Instrument recordings
 
-Every sound in Melodyshaper is a recording of a real instrument. Electric Piano is a recording of a vintage Yamaha TX81Z hardware synth.
+Every sound in Melodyshaper is a recording of a real instrument. Electric Piano and Clavi Synth are recordings of a vintage Yamaha TX81Z hardware synth.
 
 - **Versilian Community Sample Library (VCSL)**, by Versilian Studios and contributors. CC0 1.0. https://github.com/sgossner/VCSL
 - **Versilian Studios Chamber Orchestra 2 Community Edition (VSCO-2-CE)**, by Versilian Studios and contributors. CC0 1.0. https://github.com/sgossner/VSCO-2-CE

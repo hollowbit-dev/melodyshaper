@@ -6,7 +6,7 @@ export const SCALES = {
   majpent: { name: 'Pentatonic (bright)', steps: [0, 2, 4, 7, 9] },
   minpent: { name: 'Pentatonic (dark)', steps: [0, 3, 5, 7, 10] },
 };
-export const TRACK_BASE = { chords: 48, bass: 36, melody: 60, vocal: 60 };
+export const TRACK_BASE = { chords: 48, bass: 36, melody: 60, vocal: 60, guitar: 60 };
 // The grid is always sixteenth notes. barSteps = grid cells per bar, beatSteps = cells per counted beat.
 // In 6/8 the speed counts the two big beats, and the count-in counts all six eighth notes.
 export const METERS = {
@@ -152,6 +152,81 @@ export function fitChords(melody, { key, scale, meter = '4/4', bars }, count = 3
 }
 
 export const notesForChords = (degrees, meter = '4/4') => degrees.flatMap((d, bar) => [0, 2, 4].map((o) => ({ deg: d + o, step: bar * METERS[meter].barSteps, len: METERS[meter].barSteps })));
+
+// Writes a melody over chords or a bass line with fixed music rules (no AI): strong beats land on chord
+// notes, weak beats step between them, and four-bar phrases repeat a short idea so it sounds intentional.
+export const MELODY_STYLES = [{ id: 'simple', name: 'Simple' }, { id: 'flowing', name: 'Flowing' }, { id: 'catchy', name: 'Catchy' }];
+function randomizer(seed) {
+  let a = (seed * 2654435761 + 1) >>> 0;
+  return () => { a = (a + 0x6d2b79f5) >>> 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t ^= t + Math.imul(t ^ (t >>> 7), 61 | t); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function barRhythm(rand, style, meter) {
+  const { barSteps, countSteps } = METERS[meter];
+  const lengths = style === 'simple' ? [countSteps, countSteps, countSteps * 2] : style === 'flowing' ? [2, 2, countSteps, 2] : [1, 2, 3, countSteps, 2].filter((x) => x <= countSteps + 1);
+  const rests = style === 'simple' ? 0.08 : style === 'flowing' ? 0.06 : 0.16, out = [];
+  for (let step = 0; step < barSteps;) {
+    let len = lengths[Math.floor(rand() * lengths.length)];
+    // Long notes stop at the bar line, and odd lengths resolve back onto the eighth-note grid.
+    len = Math.min(len, barSteps - step);
+    if (step > 0 && rand() < rests) { step += Math.min(2, barSteps - step); continue; }
+    out.push({ at: step, len, up: rand() < 0.5 ? 1 : -1, shape: rand() * 2 - 1 });
+    step += len;
+  }
+  return out;
+}
+export function makeMelody(source, { kind = 'chords', scale, meter = '4/4', bars, style = 'flowing', seed = 1 }) {
+  const { barSteps, countSteps } = METERS[meter], size = SCALES[scale].steps.length, top = rowCount(scale) - 1;
+  const cls = (d) => ((d % size) + size) % size, rand = randomizer(seed);
+  let last = null;
+  const harmony = Array.from({ length: bars }, (_, bar) => {
+    const here = source.filter((n) => n.step < (bar + 1) * barSteps && n.step + n.len > bar * barSteps);
+    if (here.length) {
+      const first = Math.min(...here.map((n) => n.step));
+      const start = here.filter((n) => n.step === first);
+      last = kind === 'bass' ? [0, 2, 4].map((o) => cls(Math.min(...start.map((n) => n.deg)) + o)) : [...new Set(start.map((n) => cls(n.deg)))];
+    }
+    return last;
+  });
+  const fallback = harmony.find(Boolean) || [0, 2, 4].map(cls);
+  const chordAt = (bar) => harmony[bar] || fallback;
+  // This range spans a full octave, so every chord note always has a place in it.
+  const low = Math.max(1, Math.floor(size / 2)), high = Math.min(top, size + Math.ceil(size / 2));
+  const keepIn = (d) => Math.max(low, Math.min(high, d));
+  // Picks the chord note closest to where the phrase wants to go, avoiding repeats and big leaps.
+  const nearest = (from, tones, target = from) => {
+    let best = keepIn(from), score = Infinity;
+    for (let d = low; d <= high; d++) {
+      if (!tones.includes(cls(d))) continue;
+      const leap = Math.abs(d - from), cost = Math.abs(d - target) + (d === from ? 1.2 : 0) + (leap > 3 ? (leap - 3) * 0.7 : 0);
+      if (cost < score) { score = cost; best = d; }
+    }
+    return best;
+  };
+  const ideaA = barRhythm(rand, style, meter), ideaB = barRhythm(rand, style, meter), notes = [];
+  const middle = (low + high) / 2, reach = (high - low) / 2;
+  let deg = nearest(Math.round(middle), chordAt(0), middle - 1 + rand() * 2);
+  for (let bar = 0; bar < bars; bar++) {
+    const inPhrase = bar % 4, closes = inPhrase === 3 || bar === bars - 1;
+    let cells = inPhrase === 2 ? ideaB : ideaA;
+    if (closes) {
+      // A phrase ends by landing and holding, which is what makes it sound finished.
+      const cut = Math.floor(barSteps / 2 / countSteps) * countSteps;
+      cells = [...cells.filter((c) => c.at < cut).map((c) => ({ ...c, len: Math.min(c.len, cut - c.at) })), { at: cut, len: barSteps - cut, up: -1, shape: -0.5 }];
+    }
+    const tones = chordAt(bar);
+    cells.forEach((cell, i) => {
+      const strong = cell.at % countSteps === 0, end = closes && i === cells.length - 1;
+      // Each four-bar phrase rises towards its middle and comes back down.
+      const place = (inPhrase + cell.at / barSteps) / 4, target = middle - reach * 0.55 + Math.sin(place * Math.PI) * reach * 1.1 + cell.shape * 1.2;
+      if (end) deg = bar === bars - 1 && tones.includes(0) ? nearest(deg, [0], middle - 1) : nearest(deg, tones, target);
+      else if (strong) deg = nearest(deg, tones, target);
+      else deg = keepIn(deg + (Math.abs(target - deg) < 0.6 ? cell.up : Math.sign(target - deg)));
+      const vel = cell.at === 0 ? 1 : strong ? 0.88 : 0.72;
+      notes.push({ deg, step: bar * barSteps + cell.at, len: Math.max(1, cell.len), vel });
+    });
+  }
+  return notes;
+}
 
 // How a chord is played. The written notes never change, so a style can be swapped at any time.
 export const CHORD_STYLES = [

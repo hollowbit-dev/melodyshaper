@@ -36,9 +36,29 @@ const INSTRUMENTS = [
   { id: 'oboe', name: 'Oboe', repo: 'vsco', dir: 'Woodwinds/Oboe/Vib/', re: `Oboe_Vib_${NOTE}_v1_Main\\.wav$`, secs: 4, release: 0.15, sustain: true },
   { id: 'horn', name: 'French Horn', repo: 'vsco', dir: 'Brass/F Horn/sus/', re: `MOHorn_sus_${NOTE}_v1_1\\.wav$`, secs: 4, release: 0.2, sustain: true },
   { id: 'trombone', name: 'Trombone', repo: 'vsco', dir: 'Brass/Tenor Trombone/sus/', re: `tenortbn_sus_${NOTE}_v1_1\\.wav$`, secs: 4, release: 0.15, sustain: true },
+  { id: 'harpsichord', name: 'Harpsichord', repo: 'vcsl', dir: 'Chordophones/Zithers/Harpsichord, Flemish/Sustains/', re: `HarpsiRH_Low_Far_${NOTE}_rr1\\.wav$`, secs: 3, release: 0.2 },
+  { id: 'clavi', name: 'Clavi Synth', repo: 'vcsl', dir: 'Electrophones/TX81Z/Clavisynth/', re: `Clavisynth_${NOTE}_vl2\\.wav$`, secs: 2.5, release: 0.15 },
+  { id: 'xylo', name: 'Xylophone', repo: 'vcsl', dir: 'Idiophones/Struck Idiophones/Xylophone/Medium Mallets/', re: `Xylo_Medium_${NOTE}_ff_01_far\\.wav$`, secs: 1.5, release: 0.15 },
+  { id: 'handchimes', name: 'Hand Chimes', repo: 'vcsl', dir: 'Idiophones/Struck Idiophones/Hand Chimes/', re: `sus_${NOTE}_r01_main\\.wav$`, secs: 4, release: 0.4 },
+  { id: 'folkharp', name: 'Folk Harp', repo: 'vcsl', dir: 'Chordophones/Composite Chordophones/Folk Harp/', re: `EWHarp_Normal_${NOTE}_v2_RR1\\.wav$`, secs: 4, release: 0.35 },
+  { id: 'dantranh', name: 'Dan Tranh Zither', repo: 'vcsl', dir: 'Chordophones/Zithers/Dan Tranh/Normal/', re: `^${NOTE}_mf_1\\.wav$`, secs: 3, release: 0.25 },
+  { id: 'mbira', name: 'Mbira', repo: 'vcsl', dir: 'Idiophones/Plucked Idiophones/Mbira Mavembe (Gandanga), Zimbabwe, Low G/', re: `Mbira5_Normal_MainSpirit_${NOTE}_k\\d+_vl2_rr1\\.wav$`, secs: 3, release: 0.25 },
+  { id: 'violinpizz', name: 'Violin Pizzicato', repo: 'vsco', dir: 'Strings/Solo Violin/Pizz/', re: `LLVln_Pizz_${NOTE}_f_RR1\\.wav$`, secs: 1.5, release: 0.12 },
+  { id: 'cellopizz', name: 'Cello Pizzicato', repo: 'vsco', dir: 'Strings/Cello Section/pizzT/', re: `pizzT_${NOTE}_v1_RR1\\.wav$`, secs: 2, release: 0.15 },
+  { id: 'violin', name: 'Solo Violin', repo: 'vsco', dir: 'Strings/Solo Violin/Arco Vib/', re: `LLVln_ArcoVib_${NOTE}_f\\.wav$`, secs: 4, release: 0.25, sustain: true },
+  { id: 'tremolo', name: 'Tremolo Strings', repo: 'vsco', dir: 'Strings/Violin Section/Trem/', re: `VlnEns_Trem_${NOTE}_v1\\.wav$`, secs: 4, release: 0.25, sustain: true },
+  { id: 'bowedbass', name: 'Bowed Bass', repo: 'vsco', dir: 'Strings/Solo Contrabass/SusVib/', re: `BKCtbss_SusVib_${NOTE}_v1_rr1\\.wav$`, secs: 4, release: 0.25, sustain: true },
+  { id: 'piccolo', name: 'Piccolo', repo: 'vsco', dir: 'Woodwinds/Piccolo/Sus/', re: `piccolo_${NOTE}_sustain1\\.wav$`, secs: 3, release: 0.15, sustain: true },
+  { id: 'recorder', name: 'Recorder', repo: 'vcsl', dir: 'Aerophones/Edge-blown Aerophones/Baroque Alto Recorder/Sustain/', re: `AltRecorder_Sus_${NOTE}_rr1_Main\\.wav$`, secs: 3, release: 0.12, sustain: true },
+  { id: 'ocarina', name: 'Ocarina', repo: 'vcsl', dir: 'Aerophones/Edge-blown Aerophones/Ocarina, Typical/Sustains/', re: `StdOcarina_Sus_${NOTE}\\.wav$`, secs: 3, release: 0.12, sustain: true },
+  { id: 'harmonica', name: 'Harmonica', repo: 'vcsl', dir: 'Aerophones/Free Aerophones/Harmonica-Hohner-Super64/Sustains/', re: `Hohner-Super64_Normal _${NOTE}\\.wav$`, secs: 3, release: 0.12, sustain: true },
+  { id: 'saxello', name: 'Saxello', repo: 'vcsl', dir: 'Aerophones/Reed Aerophones/Saxello/Non-Vibrato/', re: `BrettSaxello_SusNV_MainSpirit_${NOTE}_vl\\d_rr\\d\\.wav$`, secs: 3.5, release: 0.15, sustain: true },
+  { id: 'bassoon', name: 'Bassoon', repo: 'vsco', dir: 'Woodwinds/Bassoon/sus/', re: `PSBassoon_${NOTE}_v1_1\\.wav$`, secs: 3.5, release: 0.15, sustain: true },
+  { id: 'tuba', name: 'Tuba', repo: 'vsco', dir: 'Brass/Tuba/sus/', re: `Tuba3_sus_${NOTE}_v1_rr1_Mid\\.wav$`, secs: 3.5, release: 0.15, sustain: true },
+  { id: 'mutetrumpet', name: 'Muted Trumpet', repo: 'vsco', dir: 'Brass/Trumpet/straightM-sus/', re: `Sum_SHTrumpet_straightM-sus_${NOTE}_v1_rr1\\.wav$`, secs: 3.5, release: 0.15, sustain: true },
 ];
 
-const GROUPS = { Keys: ['piano', 'grand', 'epiano', 'organ'], Mallets: ['marimba', 'vibes', 'glock', 'chimes', 'kalimba'], Plucked: ['harp', 'strum', 'pizz', 'bass'], Strings: ['strings', 'viola', 'cello'], Winds: ['flute', 'clarinet', 'oboe', 'sax'], Brass: ['trumpet', 'horn', 'trombone'] };
+const GROUPS = { Keys: ['piano', 'grand', 'epiano', 'organ', 'harpsichord', 'clavi'], Mallets: ['marimba', 'vibes', 'xylo', 'glock', 'chimes', 'handchimes', 'kalimba', 'mbira'], Plucked: ['harp', 'folkharp', 'strum', 'dantranh', 'pizz', 'violinpizz', 'cellopizz', 'bass'], Strings: ['strings', 'tremolo', 'violin', 'viola', 'cello', 'bowedbass'], Winds: ['flute', 'piccolo', 'recorder', 'ocarina', 'clarinet', 'oboe', 'bassoon', 'sax', 'saxello', 'harmonica'], Brass: ['trumpet', 'mutetrumpet', 'horn', 'trombone', 'tuba'] };
 const groupOf = (id) => Object.keys(GROUPS).find((g) => GROUPS[g].includes(id));
 
 const DRUMS = [
@@ -53,6 +73,24 @@ const DRUMS = [
   { id: 'tamb', name: 'Tambourine', repo: 'vcsl', path: 'Idiophones/Struck Idiophones/Tambourine 1/Tamb1_Hit_v2_rr1_Mid.wav', secs: 0.7 },
   { id: 'cowbell', name: 'Cowbell', repo: 'vcsl', path: 'Idiophones/Struck Idiophones/Cowbells/Cowbell1_Hit_v3_rr1_Mid.wav', secs: 0.7 },
   { id: 'crash', name: 'Crash', repo: 'vsco', path: 'Percussion/cymbal-crash1_mf_rr1.wav', secs: 3 },
+  { id: 'ride', name: 'Ride', repo: 'vcsl', find: /Suspended Cymbal 1\/susCymb1_hit_(?!bell)[^/]*\.wav$/, secs: 2.5 },
+  { id: 'rim', name: 'Rim click', repo: 'vcsl', find: /Snare Drum, Modern 1\/Snare2_stick[^/]*rr1_Mid\.wav$/, secs: 0.4 },
+  { id: 'lowtom', name: 'Low tom', repo: 'vcsl', find: /Tom 2\/Stick\/TomL_HitS_v2_rr1_Mid\.wav$/, secs: 1.2 },
+  { id: 'lowconga', name: 'Low conga', repo: 'vcsl', find: /Conga\/Tumba_HitN_v3_rr1_Sum\.wav$|Conga\/Tumba_HitN[^/]*rr1_Sum\.wav$/, secs: 0.9 },
+  { id: 'bongo', name: 'Bongo', repo: 'vcsl', find: /Bongos\/BongoH_Hit1_v2_rr1_Mid\.wav$|Bongos\/BongoH_Hit1[^/]*rr1_Mid\.wav$/, secs: 0.5 },
+  { id: 'lowbongo', name: 'Low bongo', repo: 'vcsl', find: /Bongos\/BongoL_Hit1_v2_rr1_Mid\.wav$|Bongos\/BongoL_Hit1[^/]*rr1_Mid\.wav$/, secs: 0.6 },
+  { id: 'cajon', name: 'Cajon', repo: 'vcsl', find: /Cajon\/Cajon_hit1_f_rr1\.wav$/, secs: 0.6 },
+  { id: 'cajonslap', name: 'Cajon slap', repo: 'vcsl', find: /Cajon\/Cajon_hit3_f_rr1\.wav$/, secs: 0.5 },
+  { id: 'framedrum', name: 'Frame drum', repo: 'vcsl', find: /Frame Drum\/HDrumL_Hit_[^/]*rr1_Sum\.wav$/, secs: 0.8 },
+  { id: 'darbuka', name: 'Darbuka', repo: 'vcsl', find: /Darbuka\/Darbuka_1_hit_vl2[^/]*\.wav$/, secs: 0.6 },
+  { id: 'claves', name: 'Claves', repo: 'vcsl', find: /Claves\/Claves1_Hit_v2_rr1_Mid\.wav$/, secs: 0.3 },
+  { id: 'woodblock', name: 'Woodblock', repo: 'vcsl', find: /Woodblock\/wood_click_f[^/]*\.wav$/, secs: 0.3 },
+  { id: 'agogo', name: 'Agogo', repo: 'vcsl', find: /Agogo Bells\/Agogo_High_v2_rr1_Mid\.wav$|Agogo Bells\/Agogo_High[^/]*rr1_Mid\.wav$/, secs: 0.6 },
+  { id: 'triangle', name: 'Triangle', repo: 'vcsl', find: /Triangles\/Triangle1_Hit_[^/]*rr1_Mid\.wav$/, secs: 1.2 },
+  { id: 'guiro', name: 'Guiro', repo: 'vcsl', find: /Guiro\/Guiro_Hit_rr1_Mid\.wav$/, secs: 0.4 },
+  { id: 'cabasa', name: 'Cabasa', repo: 'vcsl', find: /Cabasa\/Cabasa1_Hit_rr1_Mid\.wav$/, secs: 0.3 },
+  { id: 'sleigh', name: 'Sleigh bells', repo: 'vcsl', find: /Sleigh Bells\/Sleighbells_Hit[^/]*rr1_Mid\.wav$/, secs: 0.6 },
+  { id: 'gong', name: 'Gong', repo: 'vcsl', find: /Gong 1\/gong_mf\.wav$/, secs: 4 },
 ];
 
 const PC = { C: 0, 'C#': 1, D: 2, 'D#': 3, E: 4, F: 5, 'F#': 6, G: 7, 'G#': 8, A: 9, 'A#': 10, B: 11 };
@@ -131,12 +169,15 @@ function encode(input, output, secs) {
 }
 
 fs.mkdirSync(CACHE, { recursive: true });
-fs.rmSync(OUT, { recursive: true, force: true });
+// MELODY_SAMPLES_ADD=1 keeps the sounds already built and only adds new ones.
+const ADD = process.env.MELODY_SAMPLES_ADD === '1';
+if (!ADD) fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
-const manifest = { license: 'CC0-1.0', sources: ['VCSL', 'VSCO-2-CE'], instruments: [], drums: [] };
+const manifest = ADD ? JSON.parse(fs.readFileSync(path.join(OUT, 'manifest.json'), 'utf8')) : { license: 'CC0-1.0', sources: ['VCSL', 'VSCO-2-CE'], instruments: [], drums: [] };
 const files = { vcsl: await tree('vcsl'), vsco: await tree('vsco') };
 
 for (const inst of INSTRUMENTS) {
+  if (manifest.instruments.some((x) => x.id === inst.id)) continue;
   // These files are numbered by semitone instead of named by note, so the measured pitches set the anchor.
   if (inst.numbered) {
     const list = files[inst.repo].filter((p) => p.startsWith(inst.dir) && /_(\d+)\.wav$/.test(p)).map((p) => ({ p, num: Number(p.match(/_(\d+)\.wav$/)[1]) })).sort((a, b) => a.num - b.num);
@@ -199,11 +240,17 @@ for (const inst of INSTRUMENTS) {
 
 fs.mkdirSync(path.join(OUT, 'drums'), { recursive: true });
 for (const d of DRUMS) {
-  const wav = await download(d.repo, d.path);
+  if (manifest.drums.some((x) => x.id === d.id)) continue;
+  const source = d.path || files[d.repo].find((p) => d.find.test(p));
+  if (!source) throw new Error(`${d.id}: no file found`);
+  const wav = await download(d.repo, source);
   const file = `drums/${d.id}.opus`;
   encode(wav, path.join(OUT, file), d.secs);
   manifest.drums.push({ id: d.id, name: d.name, file });
 }
+const groupRank = Object.keys(GROUPS);
+manifest.instruments.forEach((i) => { i.group = groupOf(i.id); });
+manifest.instruments.sort((a, b) => groupRank.indexOf(a.group) - groupRank.indexOf(b.group) || GROUPS[a.group].indexOf(a.id) - GROUPS[b.group].indexOf(b.id));
 fs.writeFileSync(path.join(OUT, 'manifest.json'), JSON.stringify(manifest, null, 1));
 const total = execFileSync('du', ['-sh', OUT]).toString().split('\t')[0];
 console.log(`Done: ${manifest.instruments.length} instruments, ${manifest.drums.length} drums, ${total}`);

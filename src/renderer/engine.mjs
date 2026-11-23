@@ -1,10 +1,23 @@
 import { degToMidi, expandStyle, METERS, stepSeconds, TRACK_BASE } from './theory.mjs';
 
 const LOOKAHEAD = 0.14;
-const DRUM_LEVEL = { hat: 0.5, openhat: 0.5, shaker: 0.5, tamb: 0.5, cowbell: 0.55, crash: 0.6, conga: 0.75 };
+const DRUM_LEVEL = { hat: 0.5, openhat: 0.5, shaker: 0.5, tamb: 0.5, cowbell: 0.55, crash: 0.6, conga: 0.75, ride: 0.45, rim: 0.7, lowconga: 0.75, bongo: 0.7, lowbongo: 0.7, claves: 0.55, woodblock: 0.55, agogo: 0.5, triangle: 0.4, guiro: 0.5, cabasa: 0.45, sleigh: 0.45, gong: 0.55 };
 const DEFAULT_FX = { pan: 0, reverb: 0.16, echo: 0, tone: 0 };
-const GM_PROGRAM = { piano: 0, grand: 0, epiano: 4, organ: 19, glock: 9, vibes: 11, marimba: 12, chimes: 14, kalimba: 108, strum: 25, bass: 32, viola: 41, cello: 42, pizz: 45, harp: 46, strings: 48, trumpet: 56, trombone: 57, horn: 60, sax: 66, oboe: 68, clarinet: 71, flute: 73 };
-const GM_DRUM = { kick: 36, snare: 38, clap: 39, hat: 42, tom: 47, shaker: 70, openhat: 46, crash: 49, tamb: 54, cowbell: 56, conga: 63 };
+const GM_PROGRAM = { piano: 0, grand: 0, epiano: 4, organ: 19, glock: 9, vibes: 11, marimba: 12, chimes: 14, kalimba: 108, strum: 25, bass: 32, viola: 41, cello: 42, pizz: 45, harp: 46, strings: 48, trumpet: 56, trombone: 57, horn: 60, sax: 66, oboe: 68, clarinet: 71, flute: 73, harpsichord: 6, clavi: 7, xylo: 13, handchimes: 14, folkharp: 46, dantranh: 107, mbira: 108, violinpizz: 45, cellopizz: 45, violin: 40, tremolo: 44, bowedbass: 43, piccolo: 72, recorder: 74, ocarina: 79, harmonica: 22, saxello: 64, bassoon: 70, tuba: 58, mutetrumpet: 59 };
+export const GM_DRUM = { kick: 36, snare: 38, clap: 39, hat: 42, tom: 47, shaker: 70, openhat: 46, crash: 49, tamb: 54, cowbell: 56, conga: 63, ride: 51, rim: 37, lowtom: 45, lowconga: 64, bongo: 60, lowbongo: 61, cajon: 35, cajonslap: 40, framedrum: 41, darbuka: 62, claves: 75, woodblock: 76, agogo: 67, triangle: 81, guiro: 73, cabasa: 69, sleigh: 83, gong: 52 };
+// Amp sounds for a guitar track. The recording stays clean, so the sound can be changed after playing.
+export const AMPS = [
+  { id: 'clean', name: 'Clean', drive: 1.2, low: 70, high: 9000, level: 1 },
+  { id: 'warm', name: 'Warm', drive: 2.5, low: 80, high: 5200, level: 0.9 },
+  { id: 'crunch', name: 'Crunch', drive: 7, low: 90, high: 5600, level: 0.62 },
+  { id: 'drive', name: 'Overdrive', drive: 18, low: 100, high: 5000, level: 0.5 },
+  { id: 'lead', name: 'Lead', drive: 42, low: 130, high: 4400, level: 0.42 },
+];
+function ampCurve(drive) {
+  const curve = new Float32Array(2049), top = Math.tanh(drive);
+  for (let i = 0; i < curve.length; i++) curve[i] = Math.tanh(((i - 1024) / 1024) * drive) / top;
+  return curve;
+}
 
 const DRIVE = 1.3; // how hard the mix is pushed into the limiter
 const RING_SECONDS = 3;
@@ -113,11 +126,22 @@ export class Engine {
     if (!bus) {
       const input = ctx.createGain(), tone = ctx.createBiquadFilter(), pan = ctx.createStereoPanner(), verbSend = ctx.createGain(), echoSend = ctx.createGain();
       tone.type = 'highshelf'; tone.frequency.value = 2400;
-      input.connect(tone); tone.connect(pan); pan.connect(graph.master);
+      let amp = null;
+      if (track.role === 'guitar') {
+        amp = { shaper: ctx.createWaveShaper(), low: ctx.createBiquadFilter(), high: ctx.createBiquadFilter(), level: ctx.createGain() };
+        amp.shaper.oversample = '4x'; amp.low.type = 'highpass'; amp.high.type = 'lowpass';
+        input.connect(amp.shaper); amp.shaper.connect(amp.low); amp.low.connect(amp.high); amp.high.connect(amp.level); amp.level.connect(tone);
+      } else input.connect(tone);
+      tone.connect(pan); pan.connect(graph.master);
       pan.connect(verbSend); verbSend.connect(graph.verb);
       pan.connect(echoSend); echoSend.connect(graph.delay);
-      bus = { input, tone, pan, verbSend, echoSend, key: '' };
+      bus = { input, tone, pan, verbSend, echoSend, amp, ampId: '', key: '' };
       graph.tracks.set(track.id, bus);
+    }
+    if (bus.amp && bus.ampId !== (track.amp || 'crunch')) {
+      const a = AMPS.find((x) => x.id === track.amp) || AMPS[2];
+      bus.amp.shaper.curve = ampCurve(a.drive); bus.amp.low.frequency.value = a.low; bus.amp.high.frequency.value = a.high; bus.amp.level.gain.value = a.level;
+      bus.ampId = a.id;
     }
     const on = !track.mute && (!soloed || track.solo), fx = track.fx || DEFAULT_FX;
     const key = `${on ? track.vol : 0}|${fx.pan}|${fx.reverb}|${fx.echo}|${fx.tone}`;
@@ -149,7 +173,7 @@ export class Engine {
 
   removeBus(id) {
     const bus = this.graph?.tracks.get(id);
-    if (bus) { bus.input.disconnect(); bus.tone.disconnect(); bus.pan.disconnect(); bus.verbSend.disconnect(); bus.echoSend.disconnect(); this.graph.tracks.delete(id); }
+    if (bus) { bus.input.disconnect(); if (bus.amp) Object.values(bus.amp).forEach((n) => n.disconnect()); bus.tone.disconnect(); bus.pan.disconnect(); bus.verbSend.disconnect(); bus.echoSend.disconnect(); this.graph.tracks.delete(id); }
   }
 
   async load(file) {

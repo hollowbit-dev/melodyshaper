@@ -124,6 +124,32 @@ main { flex: 1; min-height: 0; display: grid; grid-template-columns: 228px minma
 .fit:hover { background: var(--hover); border-color: var(--line-strong); }
 .fit.on, .fit.on:hover { color: #17151f; background: var(--text); border-color: transparent; }
 .fit.on small { color: rgba(23,21,31,.65); }
+.makeNote { width: 100%; margin: 2px 0 0; color: var(--faint); font-size: 11.5px; }
+.beatGroup { width: 100%; margin-bottom: 3px; }
+.ampPick { width: 100%; }
+#inputs { width: 430px; max-height: calc(100vh - 40px); padding: 20px; overflow-y: auto; color: var(--text); background: #232130; border: 1px solid var(--line-strong); border-radius: 14px; box-shadow: 0 24px 60px rgba(0,0,0,.5); }
+#inputs::backdrop { background: rgba(12,11,17,.6); }
+#inputs h3 { margin: 0 0 4px; font-size: 15px; }
+#inputs h4 { margin: 14px 0 8px; padding-top: 12px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); }
+#inputs > label { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: 8px; margin-bottom: 8px; color: var(--muted); font-size: 12px; }
+#inputs select, #inputs input[type=range] { width: 100%; min-width: 0; }
+#inputs > label.check { display: flex; color: var(--text); }
+#inputs .check input { accent-color: var(--accent2); }
+#inputs small { color: var(--faint); }
+#inputs .meter { margin: 0 0 12px; }
+.inHint { margin: 0 0 10px; color: var(--muted); font-size: 12px; }
+.tuner { padding: 12px; text-align: center; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,.03); }
+#tunerNote { font-size: 30px; line-height: 36px; font-weight: 720; }
+.tunerBar { position: relative; height: 6px; margin: 8px 12px; border-radius: 3px; background: rgba(255,255,255,.1); }
+.tunerBar span { position: absolute; left: 50%; top: -3px; width: 2px; height: 12px; margin-left: -1px; background: var(--muted); }
+.tunerBar i { position: absolute; left: 50%; top: -3px; width: 4px; height: 12px; margin-left: -2px; border-radius: 2px; background: var(--accent); transition: transform .08s linear; }
+.tunerBar i.ok { background: #4ade80; }
+#tunerText { color: var(--muted); font-size: 12px; }
+#tunerStrings { display: flex; justify-content: center; gap: 4px; margin-top: 8px; }
+#tunerStrings span { width: 30px; padding: 3px 0; font-size: 11px; font-weight: 620; color: var(--faint); border-radius: 5px; background: var(--raised); }
+#tunerStrings span.on { color: #17151f; background: var(--text); }
+#inputsBtn.on { color: #fb923c; }
+#inputsClose { display: block; margin: 12px 0 0 auto; }
 #rollCard { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
 #tools { flex: none; display: flex; align-items: center; gap: 14px; height: 38px; padding: 0 10px; color: var(--muted); font-size: 12px; border-bottom: 1px solid var(--line); }
 #tools label { display: flex; align-items: center; gap: 6px; white-space: nowrap; }

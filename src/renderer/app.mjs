@@ -1,12 +1,14 @@
-import { CHORD_STYLES, METERS, PROGRESSIONS, SCALES, NOTE_NAMES, TRACK_BASE, beatHits, beatsFor, bassFromChords, chordLabel, chordNotes, degToMidi, fitChords, midiName, nearestDeg, notesForChords, rowCount, stepSeconds } from './theory.mjs';
-import { Engine, encodeMidi } from './engine.mjs';
-import { notesToGrid } from './pitch.mjs';
+import { CHORD_STYLES, MELODY_STYLES, METERS, PROGRESSIONS, SCALES, NOTE_NAMES, TRACK_BASE, beatHits, beatsFor, bassFromChords, chordLabel, chordNotes, degToMidi, fitChords, makeMelody, midiName, nearestDeg, notesForChords, rowCount, stepSeconds } from './theory.mjs';
+import { AMPS, Engine, GM_DRUM, encodeMidi } from './engine.mjs';
+import { beatGroups } from './beats.mjs';
+import { detectPitch, notesToGrid } from './pitch.mjs';
 import { SECTION_NAMES, addSection, duplicateTrack, unlinkBlock, flatten, forEachPart, initSections, loadSection, moveBlock, removeBlock, removeTrack, repeatSection, storeActive, switchSection } from './arrange.mjs';
 
 const $ = (id) => document.getElementById(id);
-const COLORS = { drums: '#fbbf24', chords: '#a78bfa', bass: '#2dd4bf', melody: '#ff7ab6', vocal: '#7dd3fc' };
+const COLORS = { drums: '#fbbf24', chords: '#a78bfa', bass: '#2dd4bf', melody: '#ff7ab6', vocal: '#7dd3fc', guitar: '#fb923c' };
 const GUTTER = 72;
-const DRUM_ORDER = ['crash', 'openhat', 'hat', 'shaker', 'tamb', 'cowbell', 'clap', 'snare', 'tom', 'conga', 'kick'];
+const DRUM_ORDER = ['gong', 'crash', 'ride', 'openhat', 'hat', 'sleigh', 'shaker', 'cabasa', 'tamb', 'triangle', 'cowbell', 'agogo', 'woodblock', 'claves', 'guiro', 'clap', 'rim', 'snare', 'cajonslap', 'tom', 'bongo', 'lowbongo', 'conga', 'lowconga', 'darbuka', 'framedrum', 'lowtom', 'cajon', 'kick'];
+const CORE_DRUMS = new Set(['crash', 'openhat', 'hat', 'shaker', 'tamb', 'cowbell', 'clap', 'snare', 'tom', 'conga', 'kick']);
 const info = await window.melody.info();
 if (info.platform === 'win32') document.body.classList.add('win');
 const manifest = await (await fetch('samples/manifest.json')).json();
@@ -14,7 +16,7 @@ const engine = new Engine(manifest);
 const DRUM_NAMES = Object.fromEntries(manifest.drums.map((d) => [d.id, d.name]));
 
 const MAX_TRACKS = 16;
-const kindOf = (role) => (role === 'drums' ? 'drums' : role === 'vocal' ? 'audio' : 'inst');
+const kindOf = (role) => (role === 'drums' ? 'drums' : role === 'vocal' || role === 'guitar' ? 'audio' : 'inst');
 const defaultFx = (role) => ({ pan: 0, reverb: role === 'drums' ? 0.04 : role === 'bass' ? 0.05 : 0.18, echo: 0, tone: 0 });
 const DEFAULT_INST = { chords: 'piano', bass: 'bass', melody: 'flute' };
 const blank = () => initSections({
@@ -51,13 +53,14 @@ function sanitize(raw) {
   };
   const used = new Set(), tracks = [];
   for (const r of raw.tracks.slice(0, MAX_TRACKS)) {
-    if (!r || !['drums', 'chords', 'bass', 'melody', 'vocal'].includes(r.role) || typeof r.id !== 'string' || !/^[a-z0-9-]{1,24}$/.test(r.id) || used.has(r.id)) continue;
+    if (!r || !['drums', 'chords', 'bass', 'melody', 'vocal', 'guitar'].includes(r.role) || typeof r.id !== 'string' || !/^[a-z0-9-]{1,24}$/.test(r.id) || used.has(r.id)) continue;
     used.add(r.id);
     const t = { id: r.id, role: r.role, kind: kindOf(r.role), name: typeof r.name === 'string' && r.name.trim() ? r.name.slice(0, 24) : r.role, vol: typeof r.vol === 'number' && r.vol >= 0 && r.vol <= 1 ? r.vol : 0.85, mute: !!r.mute, solo: !!r.solo };
     const num = (v, lo, hi, d) => (typeof v === 'number' && v >= lo && v <= hi ? v : d), d = defaultFx(r.role);
     t.fx = { pan: num(r.fx?.pan, -1, 1, d.pan), reverb: num(r.fx?.reverb, 0, 1, d.reverb), echo: num(r.fx?.echo, 0, 1, d.echo), tone: num(r.fx?.tone, -1, 1, d.tone) };
     if (t.kind === 'inst') t.inst = engine.inst[r.inst] ? r.inst : DEFAULT_INST[r.role];
     if (r.role === 'chords' && CHORD_STYLES.some((x) => x.id === r.style)) t.style = r.style;
+    if (r.role === 'guitar') t.amp = AMPS.some((x) => x.id === r.amp) ? r.amp : 'crunch';
     tracks.push(t);
   }
   if (!tracks.length) throw new Error('bad song');
@@ -198,7 +201,13 @@ function renderTracks() {
       s.onchange = async () => { commit(() => { t.inst = s.value; }); await engine.boot(); await engine.ensure(song); engine.preview(song, t, 0); };
       card.append(s);
     } else {
-      const f = document.createElement('div'); f.className = 'fixed'; f.textContent = t.kind === 'audio' ? 'Your voice' : 'Real drum kit'; card.append(f);
+      if (t.role === 'guitar') {
+        const s = document.createElement('select');
+        s.className = 'ampPick'; s.setAttribute('aria-label', `${t.name} amp sound`);
+        for (const x of AMPS) s.add(new Option(`Amp: ${x.name}`, x.id, false, x.id === t.amp));
+        s.onchange = () => commit(() => { t.amp = s.value; });
+        card.append(s);
+      } else { const f = document.createElement('div'); f.className = 'fixed'; f.textContent = t.kind === 'audio' ? 'Your voice' : 'Real drum kit'; card.append(f); }
     }
     const v = document.createElement('input');
     v.type = 'range'; v.min = 0; v.max = 1; v.step = 0.01; v.value = t.vol; v.setAttribute('aria-label', `${t.name} volume`);
@@ -222,19 +231,21 @@ function renderTracks() {
     const add = document.createElement('select');
     add.id = 'addTrack'; add.className = 'adder'; add.setAttribute('aria-label', 'Add a track');
     add.add(new Option('+ Add track', ''));
-    for (const [role, label] of [['vocal', 'Vocals (your voice)'], ['melody', 'Melody'], ['chords', 'Chords'], ['bass', 'Bass'], ['drums', 'Drums']]) add.add(new Option(label, role));
+    for (const [role, label] of [['guitar', 'Guitar (cable or interface)'], ['vocal', 'Vocals (your voice)'], ['melody', 'Melody'], ['chords', 'Chords'], ['bass', 'Bass'], ['drums', 'Drums']]) add.add(new Option(label, role));
     add.onchange = () => { if (add.value) addTrack(add.value); };
     host.append(add);
   }
+  routeLive();
 }
 
 function addTrack(role) {
   const same = song.tracks.filter((t) => t.role === role).length;
   let n = 1;
   while (song.tracks.some((t) => t.id === `${role}-${n}`)) n++;
-  const base = { drums: 'Drums', chords: 'Chords', bass: 'Bass', melody: 'Melody', vocal: 'Vocals' }[role];
+  const base = { drums: 'Drums', chords: 'Chords', bass: 'Bass', melody: 'Melody', vocal: 'Vocals', guitar: 'Guitar' }[role];
   const t = { id: `${role}-${n}`, role, kind: kindOf(role), name: same ? `${base} ${same + 1}` : base, fx: defaultFx(role), vol: 0.8, mute: false, solo: false };
-  if (role === 'drums') t.hits = []; else if (role === 'vocal') t.clips = []; else { t.inst = { melody: 'sax', chords: 'strings', bass: 'cello' }[role]; t.notes = []; }
+  if (role === 'guitar') t.amp = 'crunch';
+  if (role === 'drums') t.hits = []; else if (role === 'vocal' || role === 'guitar') t.clips = []; else { t.inst = { melody: 'sax', chords: 'strings', bass: 'cello' }[role]; t.notes = []; }
   commit(() => { song.tracks.push(t); });
   selected = t.id;
   renderTracks(); renderStarters(); renderPads(); renderFx(); draw();
@@ -396,7 +407,7 @@ const startPreview = async () => { await engine.boot(); await engine.ensure(song
 function renderStarters() {
   const t = track(), steps = totalSteps();
   setHumLabel();
-  if (t.role === 'drums') chipRow('Pick a beat', beatsFor(song.meter), picked.beat, (b) => { picked.beat = b.id; commit(() => { t.hits = beatHits(b, steps); }); renderStarters(); startPreview(); });
+  if (t.role === 'drums') renderBeats(t, steps);
   else if (t.role === 'chords') {
     chipRow('Pick chords', PROGRESSIONS, picked.prog, (p) => { picked.prog = p.id; commit(() => { t.notes = chordNotes(p, song.scale, steps, song.meter); }); renderStarters(); startPreview(); });
     const lead = document.createElement('span'); lead.className = 'lead sep'; lead.textContent = 'Play them as'; $('starters').append(lead);
@@ -416,9 +427,62 @@ function renderStarters() {
     commit(() => { t.notes = bassFromChords(chords, song.scale, song.meter); });
     startPreview();
   });
+  else if (t.role === 'guitar') chipRow('Your guitar', [{ id: 'hum', name: 'Record' }, { id: 'notes', name: 'Record as notes' }, { id: 'inputs', name: 'Inputs and tuner' }, { id: 'clear', name: 'Clear' }], null, (x) => {
+    if (x.id === 'hum') hum(); else if (x.id === 'notes') recordGuitarNotes(); else if (x.id === 'inputs') openInputs(); else commit(() => { t.clips = []; });
+  });
   else if (t.kind === 'audio') chipRow('Your voice', [{ id: 'hum', name: 'Record' }, { id: 'clear', name: 'Clear' }], null, (x) => { if (x.id === 'hum') hum(); else commit(() => { t.clips = []; }); });
   else chipRow('Your tune', [{ id: 'hum', name: 'Hum it' }, { id: 'clear', name: 'Clear' }], null, (x) => { if (x.id === 'hum') hum(); else commit(() => { t.notes = []; }); });
   if (t.kind === 'inst' && t.role !== 'chords') renderTakeTools(t);
+  if (t.role === 'melody') renderMaker(t);
+}
+
+// Every drum style, one style at a time so the list stays easy to read.
+function renderBeats(t, steps) {
+  const groups = beatGroups(song.meter, beatsFor(song.meter)), group = groups.find((g) => g.name === picked.genre) || groups[0];
+  chipRow('Pick a beat', group.beats, picked.beat, (b) => { picked.beat = b.id; commit(() => { t.hits = beatHits(b, steps); }); renderStarters(); renderPads(); startPreview(); draw(); });
+  const pick = document.createElement('select');
+  pick.id = 'beatGroup'; pick.className = 'beatGroup'; pick.setAttribute('aria-label', 'Drum style');
+  for (const g of groups) pick.add(new Option(`${g.name} (${g.beats.length})`, g.name, false, g === group));
+  pick.onchange = () => { picked.genre = pick.value; renderStarters(); };
+  $('starters').querySelector('.lead').after(pick);
+  const lead = document.createElement('span'); lead.className = 'lead sep'; lead.textContent = 'Drum grid'; $('starters').append(lead);
+  const all = document.createElement('button');
+  all.id = 'allDrums'; all.className = `chip${showAllDrums ? ' on' : ''}`; all.textContent = 'Show all 29 drums';
+  all.onclick = () => { showAllDrums = !showAllDrums; padSignature = ''; renderStarters(); renderPads(); draw(); };
+  $('starters').append(all);
+}
+
+// Writes a melody from the chords or bass. Pressing again gives a different one, and Undo brings back the last.
+const maker = { source: 'chords', style: 'flowing', seed: 1 };
+const sourceNotes = (role) => song.tracks.find((x) => x.role === role && !x.mute && x.notes.length)?.notes || [];
+function makeTune(t) {
+  const notes = sourceNotes(maker.source);
+  if (!notes.length) return toast(maker.source === 'chords' ? 'Pick some chords first, then a melody can follow them.' : 'Add a bass line first, then a melody can follow it.');
+  const had = t.notes.length;
+  commit(() => { t.notes = makeMelody(notes, { kind: maker.source, scale: song.scale, meter: song.meter, bars: song.bars, style: maker.style, seed: maker.seed }); });
+  maker.seed++;
+  lastTake = null;
+  renderStarters();
+  startPreview();
+  if (had) toast('New melody. Undo brings back the last one.');
+}
+function renderMaker(t) {
+  const host = $('starters');
+  const sep = document.createElement('span'); sep.className = 'lead sep'; sep.textContent = 'Make a melody'; host.append(sep);
+  if (!sourceNotes(maker.source).length) { const other = maker.source === 'chords' ? 'bass' : 'chords'; if (sourceNotes(other).length) maker.source = other; }
+  for (const [id, name] of [['chords', 'From chords'], ['bass', 'From bass']]) {
+    const b = document.createElement('button');
+    b.className = `chip${maker.source === id ? ' on' : ''}`; b.textContent = name; b.dataset.source = id;
+    b.onclick = () => { maker.source = id; renderStarters(); };
+    host.append(b);
+  }
+  const row = document.createElement('span'); row.className = 'makeNote'; row.textContent = 'Pick a style. Press again for a new one.'; host.append(row);
+  for (const s of MELODY_STYLES) {
+    const b = document.createElement('button');
+    b.className = `chip${maker.style === s.id ? ' on' : ''}`; b.textContent = s.name; b.dataset.make = s.id;
+    b.onclick = () => { maker.style = s.id; makeTune(t); };
+    host.append(b);
+  }
 }
 
 const FX = [['pan', 'Pan', -1, 1], ['reverb', 'Reverb', 0, 1], ['echo', 'Echo', 0, 1], ['tone', 'Tone', -1, 1]];
@@ -443,11 +507,25 @@ function renderAll() { selection.clear(); renderControls(); renderTracks(); rend
 const canvas = $('roll'), g = canvas.getContext('2d');
 const selection = new Set();
 const ruler = $('ruler'), rg = ruler.getContext('2d');
-let showGhosts = true;
+let showGhosts = true, showAllDrums = false;
 let W = 0, H = 0, scroll = 0, zoomBars = 0, snap = 2, marquee = null, clip = null, pasteAt = 0;
-const rowsFor = (t) => (t.kind === 'audio' ? 1 : t.kind === 'drums' ? DRUM_ORDER.length : rowCount(song.scale));
+let rowMemo = new WeakMap();
+// The grid shows the main kit plus any other drum in use, or every drum when asked.
+function drumRows(t) {
+  const hit = rowMemo.get(t.hits);
+  if (hit && hit.size === t.hits.length && hit.all === showAllDrums) return hit.list;
+  const used = new Set(t.hits.map((h) => h.drum)), list = DRUM_ORDER.filter((d) => showAllDrums || CORE_DRUMS.has(d) || used.has(d));
+  rowMemo.set(t.hits, { size: t.hits.length, all: showAllDrums, list });
+  return list;
+}
+// The 11 pads and keys: drums in this beat first, then the main kit, so kick, snare and hat stay in reach.
+function padKit(t) {
+  const bottomUp = [...DRUM_ORDER].reverse(), used = new Set(t.hits.map((h) => h.drum));
+  return [...new Set([...bottomUp.filter((d) => used.has(d)), ...bottomUp.filter((d) => CORE_DRUMS.has(d))])].slice(0, 11);
+}
+const rowsFor = (t) => (t.kind === 'audio' ? 1 : t.kind === 'drums' ? drumRows(t).length : rowCount(song.scale));
 const items = (t) => (t.kind === 'audio' ? t.clips : t.kind === 'drums' ? t.hits : t.notes);
-const rowOf = (t, n, rows) => (t.kind === 'audio' ? 0 : t.kind === 'drums' ? DRUM_ORDER.indexOf(n.drum) : rows - 1 - n.deg);
+const rowOf = (t, n, rows) => (t.kind === 'audio' ? 0 : t.kind === 'drums' ? drumRows(t).indexOf(n.drum) : rows - 1 - n.deg);
 // A recording keeps its real length, so its width on the grid follows the current speed.
 const clipSteps = (c) => { const b = engine.audio.get(c.id); return b ? Math.max(1, Math.ceil(b.duration / stepSeconds(song.bpm, song.meter))) : 4; };
 const lenOf = (n) => (n.id ? clipSteps(n) : n.len || 1);
@@ -496,7 +574,7 @@ function draw() {
     g.fillStyle = isRoot ? 'rgba(255,255,255,.055)' : r % 2 ? 'rgba(255,255,255,.012)' : 'transparent';
     g.fillRect(GUTTER, y, W - GUTTER, rh);
     g.fillStyle = isRoot ? '#f1eff7' : '#807d90';
-    const label = t.kind === 'audio' ? 'Voice' : t.kind === 'drums' ? DRUM_NAMES[DRUM_ORDER[r]] : midiName(degToMidi(deg, song.key, song.scale, TRACK_BASE[t.role]));
+    const label = t.kind === 'audio' ? (t.role === 'guitar' ? 'Guitar' : 'Voice') : t.kind === 'drums' ? DRUM_NAMES[drumRows(t)[r]] : midiName(degToMidi(deg, song.key, song.scale, TRACK_BASE[t.role]));
     g.fillText(label, 8, y + rh / 2, GUTTER - 12);
   }
   g.save();
@@ -544,7 +622,7 @@ function draw() {
     g.strokeRect(mx, my, Math.abs(marquee.x1 - marquee.x0), Math.abs(marquee.y1 - marquee.y0));
   }
   g.restore();
-  const hints = { drums: ['Pick a beat below', 'or click squares to place hits'], chords: ['Pick chords below', 'every row is in key, so nothing sounds wrong'], bass: ['Let the bass follow your chords', 'or draw your own notes'], melody: ['Hum a melody', 'or click anywhere to draw notes'], vocal: ['Record your voice', 'it plays along with your song'] };
+  const hints = { drums: ['Pick a beat below', 'or click squares to place hits'], chords: ['Pick chords below', 'every row is in key, so nothing sounds wrong'], bass: ['Let the bass follow your chords', 'or draw your own notes'], melody: ['Hum a melody', 'or click anywhere to draw notes'], vocal: ['Record your voice', 'it plays along with your song'], guitar: ['Record your guitar', 'plug in a USB cable or interface, then press Record'] };
   const e = $('empty');
   if (!items(t).length) { const [a, b] = hints[t.role]; e.textContent = ''; const big = document.createElement('b'); big.textContent = a; e.append(big, b); } else e.textContent = '';
   drawRuler(steps, visible, cw);
@@ -587,7 +665,7 @@ canvas.addEventListener('pointerdown', async (ev) => {
   const hit = t.kind === 'audio'
     ? t.clips.find((c) => step >= c.step && step < c.step + lenOf(c))
     : t.kind === 'drums'
-    ? t.hits.find((h) => h.drum === DRUM_ORDER[row] && h.step === step)
+    ? t.hits.find((h) => h.drum === drumRows(t)[row] && h.step === step)
     : t.notes.find((n) => n.deg === rows - 1 - row && step >= n.step && step < n.step + n.len);
   if (shift) {
     if (hit) { if (selection.has(hit)) selection.delete(hit); else selection.add(hit); draw(); return; }
@@ -612,7 +690,7 @@ canvas.addEventListener('pointerdown', async (ev) => {
     return;
   }
   if (t.kind === 'drums') {
-    const drum = DRUM_ORDER[row];
+    const drum = drumRows(t)[row];
     commit(() => { if (hit) t.hits = t.hits.filter((h) => h !== hit); else t.hits.push({ drum, step }); });
     if (!hit) engine.previewDrum(song, t, drum);
     gesture = { type: 'paint', add: !hit, drum };
@@ -818,7 +896,7 @@ async function liveOn(id, pick, vel = 0.85) {
     entry.note = n; entry.track = t; entry.from = engine.position() || 0;
   };
   if (t.kind === 'drums') {
-    const drum = DRUM_ORDER[DRUM_ORDER.length - 1 - (pick % DRUM_ORDER.length)];
+    const kit = padKit(t), drum = typeof pick === 'string' ? pick : kit[pick % kit.length];
     engine.previewDrum(song, t, drum, vel);
     if (capture) { const before = t.hits.length; place({ drum, vel: +vel.toFixed(2) }); const n = t.hits[before]; if (t.hits.some((h) => h !== n && h.drum === drum && h.step === n.step)) t.hits.pop(); entry.note = null; changed(); }
     return;
@@ -843,7 +921,7 @@ const KEY_LABELS = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', "'"];
 const padPick = (t, i) => (t.kind === 'drums' ? i : i + SCALES[song.scale].steps.length * liveOctave);
 let padSignature = '';
 function renderPads() {
-  const t = track(), sign = `${t.id}|${t.kind}|${t.role}|${song.key}|${song.scale}|${liveOctave}`;
+  const t = track(), sign = `${t.id}|${t.kind}|${t.role}|${song.key}|${song.scale}|${liveOctave}|${t.kind === 'drums' ? padKit(t).join() : ''}`;
   if (sign === padSignature) return;
   padSignature = sign;
   const host = $('pads');
@@ -855,7 +933,7 @@ function renderPads() {
   const grid = document.createElement('div'); grid.className = 'padGrid';
   KEY_ROW.forEach((code, i) => {
     const pick = padPick(t, i);
-    const name = t.kind === 'drums' ? DRUM_NAMES[DRUM_ORDER[DRUM_ORDER.length - 1 - (pick % DRUM_ORDER.length)]] : midiName(degToMidi(foldDeg(pick, rowsFor(t)), song.key, song.scale, TRACK_BASE[t.role]));
+    const kit = t.kind === 'drums' ? padKit(t) : null, name = kit ? DRUM_NAMES[kit[pick % kit.length]] : midiName(degToMidi(foldDeg(pick, rowsFor(t)), song.key, song.scale, TRACK_BASE[t.role]));
     const b = document.createElement('button');
     b.className = 'pad'; b.textContent = name; b.dataset.pad = i; b.title = name;
     const k = document.createElement('kbd'); k.textContent = KEY_LABELS[i]; b.append(k);
@@ -885,25 +963,48 @@ function stopRec() {
   for (const id of [...held.keys()]) liveOff(id);
   setRecUi();
 }
+// MIDI keyboards, pads and MIDI guitars. The sustain pedal holds notes the way it does on a piano.
+const GM_NOTE = Object.fromEntries(Object.entries(GM_DRUM).map(([drum, note]) => [note, drum]));
+let midiAccess = null, pedal = false;
+const pedalled = new Set();
+const midiPick = (t, note) => {
+  if (t.kind !== 'drums') return nearestDeg(note, song.key, song.scale, TRACK_BASE[t.role], -14, 28);
+  return GM_NOTE[note] || note;
+};
+function onMidi(port, { data: [status, note, velocity] }) {
+  if (inputSettings.midi !== 'all' && inputSettings.midi !== port.id) return;
+  const kind = status & 0xf0, id = `midi${note}`;
+  if (kind === 0xb0 && note === 64) {
+    pedal = velocity >= 64;
+    if (!pedal) { for (const n of pedalled) liveOff(n); pedalled.clear(); }
+  } else if (kind === 0x90 && velocity > 0) {
+    if (pedalled.delete(id)) liveOff(id);
+    liveOn(id, midiPick(track(), note), 0.25 + (velocity / 127) * 0.75);
+  } else if (kind === 0x80 || kind === 0x90) {
+    if (pedal) pedalled.add(id); else liveOff(id);
+  }
+}
+function renderMidi() {
+  const pick = $('midiDevice'), ports = midiAccess ? [...midiAccess.inputs.values()] : [];
+  pick.textContent = '';
+  pick.add(new Option(ports.length ? 'All connected devices' : 'No MIDI device found', 'all'));
+  for (const x of ports) pick.add(new Option(x.name || 'MIDI device', x.id));
+  pick.value = ports.some((x) => x.id === inputSettings.midi) ? inputSettings.midi : 'all';
+  $('midiStatus').textContent = ports.length ? 'Pick a track, press Record, and play.' : 'Plug in a MIDI keyboard or MIDI guitar and it appears here.';
+}
 async function connectMidi() {
-  if (!navigator.requestMIDIAccess) return;
+  if (!navigator.requestMIDIAccess) return renderMidi();
   try {
-    const access = await navigator.requestMIDIAccess({ sysex: false });
-    const listen = (input) => {
-      input.onmidimessage = ({ data: [status, note, velocity] }) => {
-        const kind = status & 0xf0, id = `midi${note}`;
-        if (kind === 0x90 && velocity > 0) {
-          const t = track();
-          liveOn(id, t.kind === 'drums' ? note : nearestDeg(note, song.key, song.scale, TRACK_BASE[t.role], -14, 28), 0.25 + (velocity / 127) * 0.75);
-        } else if (kind === 0x80 || kind === 0x90) liveOff(id);
-      };
-    };
-    for (const input of access.inputs.values()) listen(input);
-    access.onstatechange = ({ port }) => {
+    midiAccess = await navigator.requestMIDIAccess({ sysex: false });
+    const listen = (port) => { port.onmidimessage = (message) => onMidi(port, message); };
+    for (const input of midiAccess.inputs.values()) listen(input);
+    midiAccess.onstatechange = ({ port }) => {
       if (port.type !== 'input') return;
-      if (port.state === 'connected' && !port.onmidimessage) { listen(port); toast(`${port.name || 'MIDI keyboard'} connected.`); }
+      if (port.state === 'connected' && !port.onmidimessage) { listen(port); toast(`${port.name || 'MIDI device'} connected.`); }
+      renderMidi();
     };
   } catch { /* No MIDI permission or no MIDI support: the computer keyboard still works. */ }
+  renderMidi();
 }
 
 let clockText = '';
@@ -1068,7 +1169,7 @@ function setScale(scale) {
 
 // ---------------------------------------------------------------- hum
 let session = null, workletReady = null, lastTake = null;
-function setHumLabel() { $('humLabel').textContent = { drums: 'Beatbox a beat', audio: 'Record vocals' }[track().kind] || 'Hum a melody'; }
+function setHumLabel() { const t = track(); $('humLabel').textContent = t.role === 'guitar' ? 'Record guitar' : { drums: 'Beatbox a beat', audio: 'Record vocals' }[t.kind] || 'Hum a melody'; }
 const worker = new Worker('hum-worker.mjs', { type: 'module' });
 
 function updateLevel() {
@@ -1085,12 +1186,13 @@ function endSession() {
   setHumLabel();
   if (!s) return;
   s.timers.forEach(clearTimeout);
-  try { s.node?.disconnect(); s.source?.disconnect(); s.silent?.disconnect(); s.analyser?.disconnect(); } catch { /* already gone */ }
+  try { s.node?.disconnect(); s.source?.disconnect(); s.silent?.disconnect(); s.analyser?.disconnect(); s.input?.disconnect(); s.splitter?.disconnect(); } catch { /* already gone */ }
   s.stream?.getTracks().forEach((x) => x.stop());
   engine.click = false; engine.exclude = null;
+  if (inputSettings.hear) startLive().catch(() => {});
 }
 
-async function hum() {
+async function hum({ guitarNotes = false } = {}) {
   if (session) return;
   if (recording) stopRec();
   let target = track();
@@ -1102,11 +1204,12 @@ async function hum() {
   stop();
   const ok = await window.melody.micAccess();
   if (!ok) return toast('Melodyshaper needs your microphone to hear you.', { label: 'Open settings', run: () => window.melody.openMicSettings() });
+  stopLive();
   let stream;
   try {
-    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 } });
+    stream = await openStream();
   } catch {
-    return toast('No microphone found. Plug one in and try again.');
+    return toast('No microphone or guitar input found. Plug one in and try again.');
   }
   const ctx = await engine.boot();
   await engine.ensure(song);
@@ -1123,13 +1226,15 @@ async function hum() {
   s.analyser = ctx.createAnalyser(); s.analyser.fftSize = 512;
   s.node = new AudioWorkletNode(ctx, 'melody-capture');
   s.silent = ctx.createGain(); s.silent.gain.value = 0;
-  s.source.connect(s.analyser); s.source.connect(s.node); s.node.connect(s.silent); s.silent.connect(ctx.destination);
+  Object.assign(s, inputChain(ctx, s.source, stream));
+  s.input.connect(s.analyser); s.input.connect(s.node); s.node.connect(s.silent); s.silent.connect(ctx.destination);
+  if (target.role === 'guitar' && inputSettings.hear) s.input.connect(engine.trackBus(ctx, engine.graph, { ...target, mute: false }, false));
   s.node.port.onmessage = ({ data }) => s.chunks.push(data);
 
   const meter = METERS[song.meter], beat = stepSeconds(song.bpm, song.meter) * meter.countSteps, lead = 0.25;
   const startAt = ctx.currentTime + lead + beat * meter.count;
   $('overlay').hidden = false;
-  $('overlayText').textContent = 'Get ready. Headphones work best.';
+  $('overlayText').textContent = guitarNotes ? 'Get ready. Play one note at a time.' : 'Get ready. Headphones work best.';
   for (let i = 0; i < meter.count; i++) {
     const at = ctx.currentTime + lead + beat * i;
     engine.tick(ctx, at, i === 0);
@@ -1140,8 +1245,8 @@ async function hum() {
   engine.click = true;
   const t0 = engine.start(song, { delay: startAt - ctx.currentTime, loop: false, onEnd: () => setTimeout(() => finishHum(target, t0), 180) });
   s.timers.push(setTimeout(() => {
-    $('count').textContent = { drums: 'Go', audio: 'Sing' }[target.kind] || 'Hum';
-    $('overlayText').textContent = target.kind === 'audio' ? `Recording for ${song.bars} bars.` : target.kind === 'drums' ? `Beatbox for ${song.bars} bars. Try boom, tss and kah.` : `Hum or sing for ${song.bars} bars. Any note works.`;
+    $('count').textContent = target.role === 'guitar' || guitarNotes ? 'Play' : { drums: 'Go', audio: 'Sing' }[target.kind] || 'Hum';
+    $('overlayText').textContent = guitarNotes ? `Play single notes for ${song.bars} bars.` : target.kind === 'audio' ? `Recording for ${song.bars} bars.` : target.kind === 'drums' ? `Beatbox for ${song.bars} bars. Try boom, tss and kah.` : `Hum or sing for ${song.bars} bars. Any note works.`;
   }, (startAt - ctx.currentTime) * 1000));
 }
 
@@ -1164,7 +1269,7 @@ function finishHum(target, t0) {
     const skip = Math.min(samples.length - 1, Math.round(latency * sr)), take = samples.slice(skip);
     let peak = 0;
     for (let i = 0; i < take.length; i += 8) peak = Math.max(peak, Math.abs(take[i]));
-    if (peak < 0.004) return toast("Couldn't hear anything. Check your microphone and try again.");
+    if (peak < 0.004) return toast("Couldn't hear anything. Check your input in Inputs and try again.");
     const id = `c${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
     engine.setClip(id, take, sr);
     window.melody.clipSave({ id, bytes: encodeClip(take, sr) }).catch(() => toast("Couldn't keep that recording on disk. Save your song to be safe."));
@@ -1185,7 +1290,7 @@ function finishHum(target, t0) {
       const count = (d) => data.hits.filter((h) => h.drum === d).length;
       toast(`${count('kick')} kicks, ${count('snare')} snares, ${count('hat')} hats.${had ? ' Undo brings back the old beat.' : ''}`);
     } else {
-      if (!data.notes.length) return toast("Couldn't hear a tune. Try humming a little louder.");
+      if (!data.notes.length) return toast("Couldn't hear a tune. Try a little louder, one note at a time.");
       const previous = target.notes.length;
       commit(() => { target.notes = data.notes; });
       lastTake = { trackId: target.id, section: song.active, sung: data.sung, options, grid: 2 };
@@ -1195,6 +1300,122 @@ function finishHum(target, t0) {
     play();
   };
   worker.postMessage({ mode: isBeat ? 'beat' : 'hum', samples, sampleRate: sr, options }, [samples.buffer]);
+}
+
+// ---------------------------------------------------------------- guitar, microphone and audio interface
+const SETTINGS_KEY = 'melody.inputs';
+const inputSettings = { device: '', channel: 0, gain: 1, hear: false, midi: 'all' };
+try { Object.assign(inputSettings, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}')); } catch { /* defaults */ }
+inputSettings.hear = false; // Never start with live sound on: it could feed back through speakers.
+const saveInputs = () => { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ ...inputSettings, hear: false })); } catch { /* not saved */ } };
+let live = null, liveTicket = 0;
+
+async function openStream() {
+  const base = { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: { ideal: 2 }, latency: { ideal: 0 } };
+  if (inputSettings.device) {
+    try { return await navigator.mediaDevices.getUserMedia({ audio: { ...base, deviceId: { exact: inputSettings.device } } }); } catch { toast('That input is unplugged, so the default one is being used.'); }
+  }
+  return navigator.mediaDevices.getUserMedia({ audio: base });
+}
+// Picks one input of the device (a guitar is often on just one) and sets its level.
+function inputChain(ctx, source, stream) {
+  const channels = stream.getAudioTracks()[0]?.getSettings?.().channelCount || 1;
+  const input = ctx.createGain();
+  input.gain.value = inputSettings.gain;
+  input.channelCount = 1; input.channelCountMode = 'explicit';
+  if (channels < 2) { source.connect(input); return { input, splitter: null }; }
+  const splitter = ctx.createChannelSplitter(2);
+  source.connect(splitter);
+  splitter.connect(input, Math.min(1, inputSettings.channel));
+  return { input, splitter };
+}
+const guitarTrack = () => (track().role === 'guitar' ? track() : song.tracks.find((x) => x.role === 'guitar'));
+function routeLive() {
+  if (!live || !engine.graph) return;
+  // Passing null here would cut every connection, including the tuner's.
+  if (live.out) { try { live.input.disconnect(live.out); } catch { /* wasn't connected */ } }
+  live.out = null;
+  if (!inputSettings.hear) return;
+  const g = guitarTrack();
+  live.out = g ? engine.trackBus(engine.ctx, engine.graph, { ...g, mute: false }, false) : engine.graph.master;
+  live.input.connect(live.out);
+}
+async function startLive() {
+  if (session) return;
+  stopLive();
+  const ticket = ++liveTicket, ctx = await engine.boot(), stream = await openStream();
+  // The panel may have closed, or another input been picked, while this one was opening.
+  if (ticket !== liveTicket || session || (!$('inputs').open && !inputSettings.hear)) { stream.getTracks().forEach((x) => x.stop()); return; }
+  const source = ctx.createMediaStreamSource(stream), analyser = ctx.createAnalyser();
+  analyser.fftSize = 4096;
+  // Audio only flows through a chain that reaches the speakers, so the meter gets a silent path there.
+  const silent = ctx.createGain();
+  silent.gain.value = 0;
+  live = { stream, source, analyser, silent, out: null, ...inputChain(ctx, source, stream) };
+  live.input.connect(analyser); analyser.connect(silent); silent.connect(ctx.destination);
+  routeLive();
+  $('inputsBtn').classList.toggle('on', inputSettings.hear);
+  const ms = Math.round(((ctx.baseLatency || 0) + (ctx.outputLatency || 0) + (engine.limitDelay || 0) + (stream.getAudioTracks()[0]?.getSettings?.().latency || 0)) * 1000);
+  $('inLatency').textContent = `Delay through the app: about ${ms} ms.${ms > 25 ? ' An audio interface usually lowers this.' : ''}`;
+}
+function stopLive() {
+  liveTicket++;
+  if (!live) return;
+  try { live.source.disconnect(); live.splitter?.disconnect(); live.input.disconnect(); live.analyser.disconnect(); live.silent.disconnect(); } catch { /* already gone */ }
+  live.stream.getTracks().forEach((x) => x.stop());
+  live = null;
+  $('inputsBtn').classList.remove('on');
+}
+async function listDevices() {
+  const all = await navigator.mediaDevices.enumerateDevices(), pick = $('inDevice');
+  const list = all.filter((d) => d.kind === 'audioinput' && d.deviceId !== 'communications');
+  pick.textContent = '';
+  if (!list.length) pick.add(new Option('No input found', ''));
+  list.forEach((d, i) => pick.add(new Option(d.label || `Input ${i + 1}`, d.deviceId === 'default' ? '' : d.deviceId)));
+  if ([...pick.options].some((o) => o.value === inputSettings.device)) pick.value = inputSettings.device;
+}
+async function openInputs() {
+  $('inChannel').value = String(inputSettings.channel); $('inGain').value = inputSettings.gain; $('inHear').checked = inputSettings.hear;
+  renderMidi();
+  $('inputs').showModal();
+  clearInterval(tunerTimer); tunerTimer = setInterval(updateTuner, 55);
+  if (!await window.melody.micAccess()) { $('inLatency').textContent = 'Melodyshaper needs microphone access to hear your guitar.'; return window.melody.openMicSettings(); }
+  try { await startLive(); } catch { $('inLatency').textContent = 'No audio input found. Plug one in and open this again.'; }
+  await listDevices().catch(() => {});
+}
+function closeInputs() { if ($('inputs').open) $('inputs').close(); }
+const STRINGS = [['E', 40], ['A', 45], ['D', 50], ['G', 55], ['B', 59], ['E', 64]];
+let tunerAt = 0, tunerBuf = null, tunerTimer = 0;
+function updateTuner() {
+  if (!live) return;
+  const now = performance.now();
+  if (!tunerBuf) tunerBuf = new Float32Array(4096);
+  live.analyser.getFloatTimeDomainData(tunerBuf);
+  let e = 0; for (let i = 0; i < 512; i++) e += tunerBuf[i] * tunerBuf[i];
+  $('inLevel').style.transform = `scaleX(${Math.min(1, Math.sqrt(e / 512) * 5)})`;
+  if (now - tunerAt < 110) return;
+  tunerAt = now;
+  const midi = detectPitch(tunerBuf, engine.ctx.sampleRate), needle = $('tunerNeedle');
+  if (midi === null) { $('tunerText').textContent = 'Play one string'; return; }
+  const note = Math.round(midi), cents = Math.round((midi - note) * 100), good = Math.abs(cents) <= 5;
+  $('tunerNote').textContent = midiName(note);
+  $('tunerText').textContent = good ? 'In tune' : cents < 0 ? `${-cents} cents flat, tune up` : `${cents} cents sharp, tune down`;
+  needle.style.transform = `translateX(${(cents / 50) * 170}px)`;
+  needle.classList.toggle('ok', good);
+  document.querySelectorAll('#tunerStrings span').forEach((el, i) => el.classList.toggle('on', STRINGS[i][1] === note));
+}
+// Single notes from the guitar become editable notes, on a track of their own.
+async function recordGuitarNotes() {
+  let t = song.tracks.find((x) => x.role === 'melody' && x.name === 'Guitar notes');
+  if (!t) {
+    if (song.tracks.length >= MAX_TRACKS) return toast('This song already has 16 tracks.');
+    addTrack('melody');
+    t = track();
+    t.name = 'Guitar notes'; t.inst = 'strum';
+  }
+  selected = t.id;
+  renderTracks(); renderStarters(); renderPads(); renderFx(); draw();
+  hum({ guitarNotes: true });
 }
 
 // Re-time or move the last hum without singing it again.
@@ -1411,7 +1632,7 @@ $('swing').onchange = () => { if (swingStart) { past.push(swingStart); future = 
 $('songName').oninput = (e) => { song.name = e.target.value; changed(); };
 $('songName').onkeydown = (e) => { if (e.key === 'Enter') e.target.blur(); };
 window.addEventListener('keydown', (e) => {
-  if ($('help').open || e.code !== 'Space' || /^(INPUT|SELECT)$/.test(e.target.tagName) && e.target.type !== 'range') return;
+  if (modalOpen() || e.code !== 'Space' || /^(INPUT|SELECT)$/.test(e.target.tagName) && e.target.type !== 'range') return;
   e.preventDefault();
   if (!session) toggle();
 });
@@ -1420,6 +1641,17 @@ $('tap').onclick = () => tapTempo();
 $('metronome').onclick = () => setMetronome(!engine.metronome);
 $('ghosts').onchange = (e) => { showGhosts = e.target.checked; draw(); };
 $('noteTools').onchange = (e) => { const tool = e.target.value; e.target.value = ''; if (tool) noteTool(tool); };
+const modalOpen = () => $('help').open || $('inputs').open;
+$('inputsBtn').onclick = openInputs;
+$('inputsClose').onclick = closeInputs;
+$('inputs').addEventListener('close', () => { clearInterval(tunerTimer); if (!inputSettings.hear) stopLive(); });
+$('tunerStrings').append(...STRINGS.map(([n]) => { const s = document.createElement('span'); s.textContent = n; return s; }));
+$('inDevice').onchange = (e) => { inputSettings.device = e.target.value; saveInputs(); startLive().catch(() => toast("Couldn't open that input.")); };
+$('inChannel').onchange = (e) => { inputSettings.channel = Number(e.target.value); saveInputs(); startLive().catch(() => {}); };
+$('inGain').oninput = (e) => { inputSettings.gain = Number(e.target.value); if (live) live.input.gain.value = inputSettings.gain; };
+$('inGain').onchange = saveInputs;
+$('inHear').onchange = (e) => { inputSettings.hear = e.target.checked; routeLive(); $('inputsBtn').classList.toggle('on', inputSettings.hear && !!live); };
+$('midiDevice').onchange = (e) => { inputSettings.midi = e.target.value; saveInputs(); };
 $('helpBtn').onclick = () => $('help').showModal();
 $('helpClose').onclick = () => $('help').close();
 $('help').onclick = (e) => { if (e.target === $('help')) $('help').close(); };
@@ -1445,7 +1677,7 @@ document.addEventListener('copy', (e) => { if (!typing(document.activeElement) &
 document.addEventListener('cut', (e) => { if (!typing(document.activeElement) && copySelected()) { e.preventDefault(); removeSelected(); } });
 document.addEventListener('paste', (e) => { if (!typing(document.activeElement) && clip) { e.preventDefault(); pasteClip(); } });
 window.addEventListener('keydown', (e) => {
-  if (typing(e.target) || session || $('help').open) return;
+  if (typing(e.target) || session || modalOpen()) return;
   const mod = e.metaKey || e.ctrlKey;
   if (mod) {
     if (e.code === 'KeyD' && selection.size) { e.preventDefault(); copySelected(); pasteClip(); }
@@ -1490,5 +1722,5 @@ animate();
 // A song opened from Finder or Explorer still asks first if the last session had unsaved work.
 const pending = await window.melody.songPending();
 if (pending) await openSong(pending);
-if (info.test) window.__melody = { get song() { return song; }, get dirty() { return dirty; }, setAsk: (fn) => { askUnsaved = fn; }, keepWork, openSong, newSong, showChords, engine, select: (id) => { selected = id; selection.clear(); renderTracks(); renderStarters(); renderPads(); renderFx(); draw(); }, hum, exportBytes: () => engine.renderWav(flatten(song)), midiBytes: () => encodeMidi(flatten(song)), flatten: () => flatten(song), playSong, serializeFile, loadSong, mp3Bytes: async () => [...(await toMp3(await engine.renderWav(flatten(song)))).slice(0, 4)], stemCount: () => stemsOf(flatten(song)).length, renderStem: async (i) => { const b = await engine.renderWav(stemsOf(flatten(song))[i].project), v = new DataView(b.buffer); let p = 0; for (let k = 44; k + 1 < b.length; k += 2) p = Math.max(p, Math.abs(v.getInt16(k, true))); return { size: b.length, peak: p }; }, noteTool, playFrom, tapTempo, setMetronome, selection, selectAll, copySelected, pasteClip, removeSelected, nudge, toggleRec, get recording() { return recording; } };
+if (info.test) window.__melody = { get song() { return song; }, get dirty() { return dirty; }, inputSettings, openInputs, closeInputs, startLive, stopLive, get live() { return live; }, recordGuitarNotes, onMidi, drumRows, renderBeats: renderStarters, setAsk: (fn) => { askUnsaved = fn; }, keepWork, openSong, newSong, showChords, engine, select: (id) => { selected = id; selection.clear(); renderTracks(); renderStarters(); renderPads(); renderFx(); draw(); }, hum, exportBytes: () => engine.renderWav(flatten(song)), midiBytes: () => encodeMidi(flatten(song)), flatten: () => flatten(song), playSong, serializeFile, loadSong, mp3Bytes: async () => [...(await toMp3(await engine.renderWav(flatten(song)))).slice(0, 4)], stemCount: () => stemsOf(flatten(song)).length, renderStem: async (i) => { const b = await engine.renderWav(stemsOf(flatten(song))[i].project), v = new DataView(b.buffer); let p = 0; for (let k = 44; k + 1 < b.length; k += 2) p = Math.max(p, Math.abs(v.getInt16(k, true))); return { size: b.length, peak: p }; }, noteTool, playFrom, tapTempo, setMetronome, selection, selectAll, copySelected, pasteClip, removeSelected, nudge, toggleRec, get recording() { return recording; } };
 document.documentElement.dataset.ready = '1';

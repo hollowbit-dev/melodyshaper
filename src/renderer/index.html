@@ -20,6 +20,7 @@
     <button id="playSong" class="songBtn">Play song</button>
   </div>
   <div class="barSide right nodrag">
+    <button id="inputsBtn" class="ghost" title="Guitar, microphone and MIDI">Inputs</button>
     <button id="newSong" class="ghost">New</button>
     <button id="open" class="ghost">Open</button>
     <button id="save" class="ghost">Save</button>
@@ -78,6 +79,19 @@
   <dt>A to L</dt><dd>Play notes</dd><dt>Z / X</dt><dd>Low or high notes</dd><dt>Shift + drag</dt><dd>Select notes</dd>
   <dt>Arrows</dt><dd>Move selected notes</dd><dt>Shift + Up / Down</dt><dd>Move an octave</dd><dt>Cmd/Ctrl + D</dt><dd>Duplicate selection</dd>
   <dt>Double-click a name</dt><dd>Rename a track or section</dd></dl><button id="helpClose" class="ghost">Close</button></dialog>
+<dialog id="inputs" aria-label="Inputs"><h3>Inputs</h3>
+  <p class="inHint">Plug in a USB guitar cable or audio interface, then pick it here.</p>
+  <label>Audio input<select id="inDevice"></select></label>
+  <label>Channel<select id="inChannel"><option value="0">Input 1</option><option value="1">Input 2</option></select></label>
+  <label>Level<input id="inGain" type="range" min="0.25" max="4" step="0.05"></label>
+  <div class="meter"><i id="inLevel"></i></div>
+  <label class="check"><input id="inHear" type="checkbox">Hear my guitar as I play <small>(use headphones)</small></label>
+  <p id="inLatency" class="inHint"></p>
+  <div class="tuner" aria-label="Guitar tuner"><div id="tunerNote">–</div><div class="tunerBar"><span></span><i id="tunerNeedle"></i></div><div id="tunerText">Play one string</div><div id="tunerStrings"></div></div>
+  <h4>MIDI</h4>
+  <label>MIDI device<select id="midiDevice"></select></label>
+  <p id="midiStatus" class="inHint"></p>
+  <button id="inputsClose" class="ghost">Done</button></dialog>
 <div id="toast" role="status"></div>
 <script type="module" src="app.mjs"></script>
 </body>

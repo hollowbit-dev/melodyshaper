@@ -41,6 +41,29 @@ export function trackPitch(input, inputRate) {
   return { midi, rms };
 }
 
+// A quick single-pitch reading for the guitar tuner. Returns a MIDI note with cents, or null.
+export function detectPitch(buffer, sampleRate) {
+  const step = sampleRate > 30000 ? 2 : 1, sr = sampleRate / step, n = Math.floor(buffer.length / step), x = new Float32Array(n);
+  let energy = 0;
+  for (let i = 0; i < n; i++) { x[i] = buffer[i * step]; energy += x[i] * x[i]; }
+  if (Math.sqrt(energy / Math.max(1, n)) < 0.003) return null;
+  const maxTau = Math.min(Math.floor(sr / 55), Math.floor(n / 2) - 1), minTau = Math.floor(sr / 1400), win = n - maxTau - 1;
+  if (win < 64 || maxTau <= minTau) return null;
+  const c = new Float32Array(maxTau + 2);
+  let total = 0, tau = -1;
+  c[0] = 1;
+  for (let t = 1; t <= maxTau; t++) {
+    let d = 0;
+    for (let i = 0; i < win; i++) { const v = x[i] - x[i + t]; d += v * v; }
+    total += d;
+    c[t] = total ? (d * t) / total : 1;
+  }
+  for (let t = minTau; t < maxTau; t++) if (c[t] < 0.15) { while (t + 1 < maxTau && c[t + 1] < c[t]) t++; tau = t; break; }
+  if (tau < 2) return null;
+  const a = c[tau - 1], b = c[tau], g = c[tau + 1], den = 2 * (a - 2 * b + g);
+  return 69 + 12 * Math.log2(sr / (tau + (den ? (a - g) / den : 0)) / 440);
+}
+
 const median = (arr) => { const s = [...arr].sort((a, b) => a - b); return s[s.length >> 1]; };
 
 export function segmentNotes({ midi, rms }) {
