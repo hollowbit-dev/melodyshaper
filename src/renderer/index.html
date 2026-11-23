@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; worker-src 'self'; media-src 'self' blob:; img-src 'self' data:">
+<title>Melodyshaper</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar drag">
+  <div class="barSide nodrag">
+    <input id="songName" class="song" maxlength="80" spellcheck="false" aria-label="Song name">
+    <button id="undo" class="icon" title="Undo" aria-label="Undo"><svg viewBox="0 0 16 16"><path d="M6 3 2.500 6.500 6 10M3 6.500h6.500a3.500 3.500 0 0 1 0 7H7"/></svg></button>
+    <button id="redo" class="icon" title="Redo" aria-label="Redo"><svg viewBox="0 0 16 16"><path d="m10 3 3.500 3.500L10 10M13 6.500H6.500a3.500 3.500 0 0 0 0 7H9"/></svg></button>
+  </div>
+  <div class="deck nodrag">
+    <button id="play" class="play" aria-label="Play this section" title="Play this section (Space)"><span class="tri"></span></button>
+    <button id="rec" class="rec" aria-pressed="false" aria-label="Record" title="Record from the A to L keys or a MIDI keyboard (R)"><span></span></button>
+    <output id="clock" aria-label="Position">1.1</output>
+    <button id="playSong" class="songBtn">Play song</button>
+  </div>
+  <div class="barSide right nodrag">
+    <button id="newSong" class="ghost">New</button>
+    <button id="open" class="ghost">Open</button>
+    <button id="save" class="ghost">Save</button>
+    <select id="exportMenu" class="exportMenu" aria-label="Export">
+      <option value="">Export</option><option value="mp3">MP3</option><option value="wav">WAV</option><option value="stems">Stems (one WAV per track)</option><option value="midi">MIDI</option>
+    </select>
+  </div>
+</header>
+
+<section class="settings" aria-label="Song settings">
+  <label>Key<select id="key"></select></label>
+  <label>Mood<select id="scale"></select></label>
+  <label>Time<select id="meter" aria-label="Time signature"></select></label>
+  <label>Length<select id="bars"><option value="4">4 bars</option><option value="8">8 bars</option><option value="16">16 bars</option></select></label>
+  <label class="tempo">Speed<input id="bpm" type="range" min="60" max="180" step="1"><output id="bpmOut"></output></label>
+  <button id="tap" class="mini" title="Tap this in time to set the speed (T)">Tap</button>
+  <button id="metronome" class="mini" aria-pressed="false" title="Metronome (M)">Click</button>
+  <label class="swing">Swing<input id="swing" type="range" min="0" max="0.6" step="0.01"></label>
+  <div class="spacer"></div>
+  <button id="hum" class="hum"><span class="dot"></span><span id="humLabel">Hum a melody</span></button>
+</section>
+
+<main>
+  <aside class="tracksPane">
+    <h2>Tracks</h2>
+    <div id="tracks" aria-label="Tracks"></div>
+  </aside>
+
+  <section class="editor">
+    <div id="sections" aria-label="Song sections"></div>
+    <div id="rollCard">
+      <div id="tools" aria-label="Editing tools">
+        <label>Snap<select id="snap"><option value="1">1/16</option><option value="2" selected>1/8</option><option value="4">1/4</option></select></label>
+        <label>Zoom<select id="zoom"><option value="0">Fit</option><option value="8">8 bars</option><option value="4">4 bars</option><option value="2">2 bars</option><option value="1">1 bar</option></select></label>
+        <label>Note loudness<input id="velocity" type="range" min="0.05" max="1" step="0.01" value="1" disabled></label>
+        <select id="noteTools" aria-label="Change selected notes" disabled><option value="">Note tools</option><option value="harmony">Add harmony</option><option value="reverse">Reverse</option><option value="shorter">Half length</option><option value="longer">Double length</option></select>
+        <label class="check" title="Show the other tracks faintly behind this one"><input id="ghosts" type="checkbox" checked>Other tracks</label>
+        <div class="spacer"></div>
+        <button id="helpBtn" class="ghost helpBtn" title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts">?</button>
+      </div>
+      <canvas id="ruler" title="Click to play from here"></canvas>
+      <div id="rollWrap"><canvas id="roll"></canvas><div id="playhead"></div><div id="empty"></div></div>
+    </div>
+  </section>
+
+  <aside class="inspector">
+    <div id="starters"></div>
+    <div id="pads" aria-label="Play notes"></div>
+    <div id="fx" aria-label="Track sound"></div>
+  </aside>
+</main>
+
+<div id="overlay" hidden><div class="panel"><div id="count"></div><div id="overlayText"></div><div class="meter"><i id="level"></i></div><button id="cancelHum" class="ghost">Cancel</button></div></div>
+<dialog id="help" aria-label="Keyboard shortcuts"><h3>Shortcuts</h3><dl>
+  <dt>Space</dt><dd>Play or stop</dd><dt>R</dt><dd>Record</dd><dt>M</dt><dd>Metronome</dd><dt>T</dt><dd>Tap the speed</dd>
+  <dt>A to L</dt><dd>Play notes</dd><dt>Z / X</dt><dd>Low or high notes</dd><dt>Shift + drag</dt><dd>Select notes</dd>
+  <dt>Arrows</dt><dd>Move selected notes</dd><dt>Shift + Up / Down</dt><dd>Move an octave</dd><dt>Cmd/Ctrl + D</dt><dd>Duplicate selection</dd>
+  <dt>Double-click a name</dt><dd>Rename a track or section</dd></dl><button id="helpClose" class="ghost">Close</button></dialog>
+<div id="toast" role="status"></div>
+<script type="module" src="app.mjs"></script>
+</body>
+</html>

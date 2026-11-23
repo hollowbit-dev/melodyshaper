@@ -1,0 +1,1518 @@
+{
+ "license": "CC0-1.0",
+ "sources": [
+  "VCSL",
+  "VSCO-2-CE"
+ ],
+ "instruments": [
+  {
+   "id": "piano",
+   "name": "Piano",
+   "group": "Keys",
+   "release": 0.35,
+   "sustain": false,
+   "zones": [
+    {
+     "root": 31,
+     "cents": -4,
+     "file": "piano/31.opus"
+    },
+    {
+     "root": 36,
+     "cents": -5,
+     "file": "piano/36.opus"
+    },
+    {
+     "root": 43,
+     "cents": 7,
+     "file": "piano/43.opus"
+    },
+    {
+     "root": 48,
+     "cents": 3,
+     "file": "piano/48.opus"
+    },
+    {
+     "root": 55,
+     "cents": 5,
+     "file": "piano/55.opus"
+    },
+    {
+     "root": 60,
+     "cents": -2,
+     "file": "piano/60.opus"
+    },
+    {
+     "root": 67,
+     "cents": 9,
+     "file": "piano/67.opus"
+    },
+    {
+     "root": 72,
+     "cents": 6,
+     "file": "piano/72.opus"
+    },
+    {
+     "root": 79,
+     "cents": 5,
+     "file": "piano/79.opus"
+    },
+    {
+     "root": 84,
+     "cents": 8,
+     "file": "piano/84.opus"
+    },
+    {
+     "root": 91,
+     "cents": 8,
+     "file": "piano/91.opus"
+    },
+    {
+     "root": 96,
+     "cents": 12,
+     "file": "piano/96.opus"
+    },
+    {
+     "root": 103,
+     "cents": 3,
+     "file": "piano/103.opus"
+    }
+   ]
+  },
+  {
+   "id": "marimba",
+   "name": "Marimba",
+   "group": "Mallets",
+   "release": 0.2,
+   "sustain": false,
+   "zones": [
+    {
+     "root": 41,
+     "cents": -1,
+     "file": "marimba/41.opus"
+    },
+    {
+     "root": 48,
+     "cents": 3,
+     "file": "marimba/48.opus"
+    },
+    {
+     "root": 55,
+     "cents": 0,
+     "file": "marimba/55.opus"
+    },
+    {
+     "root": 59,
+     "cents": 3,
+     "file": "marimba/59.opus"
+    },
+    {
+     "root": 65,
+     "cents": 0,
+     "file": "marimba/65.opus"
+    },
+    {
+     "root": 72,
+     "cents": 5,
+     "file": "marimba/72.opus"
+    },
+    {
+     "root": 79,
+     "cents": -1,
+     "file": "marimba/79.opus"
+    },
+    {
+     "root": 83,
+     "cents": 3,
+     "file": "marimba/83.opus"
+    },
+    {
+     "root": 89,
+     "cents": 2,
+     "file": "marimba/89.opus"
+    },
+    {
+     "root": 96,
+     "cents": 9,
+     "file": "marimba/96.opus"
+    }
+   ]
+  },
+  {
+   "id": "vibes",
+   "name": "Vibraphone",
+   "group": "Mallets",
+   "release": 0.4,
+   "sustain": false,
+   "zones": [
+    {
+     "root": 57,
+     "cents": -2,
+     "file": "vibes/57.opus"
+    },
+    {
+     "root": 60,
+     "cents": 9,
+     "file": "vibes/60.opus"
+    },
+    {
+     "root": 64,
+     "cents": 0,
+     "file": "vibes/64.opus"
+    },
+    {
+     "root": 67,
+     "cents": 0,
+     "file": "vibes/67.opus"
+    },
+    {
+     "root": 71,
+     "cents": 0,
+     "file": "vibes/71.opus"
+    },
+    {
+     "root": 74,
+     "cents": 0,
+     "file": "vibes/74.opus"
+    },
+    {
+     "root": 77,
+     "cents": 0,
+     "file": "vibes/77.opus"
+    },
+    {
+     "root": 81,
+     "cents": 1,
+     "file": "vibes/81.opus"
+    },
+    {
+     "root": 84,
+     "cents": 2,
+     "file": "vibes/84.opus"
+    },
+    {
+     "root": 88,
+     "cents": 2,
+     "file": "vibes/88.opus"
+    }
+   ]
+  },
+  {
+   "id": "harp",
+   "name": "Harp",
+   "group": "Plucked",
+   "release": 0.4,
+   "sustain": false,
+   "zones": [
+    {
+     "root": 35,
+     "cents": -14,
+     "file": "harp/35.opus"
+    },
+    {
+     "root": 38,
+     "cents": -5,
+     "file": "harp/38.opus"
+    },
+    {
+     "root": 41,
+     "cents": -7,
+     "file": "harp/41.opus"
+    },
+    {
+     "root": 45,
+     "cents": -4,
+     "file": "harp/45.opus"
+    },
+    {
+     "root": 52,
+     "cents": -4,
+     "file": "harp/52.opus"
+    },
+    {
+     "root": 55,
+     "cents": -8,
+     "file": "harp/55.opus"
+    },
+    {
+     "root": 59,
+     "cents": -13,
+     "file": "harp/59.opus"
+    },
+    {
+     "root": 62,
+     "cents": -12,
+     "file": "harp/62.opus"
+    },
+    {
+     "root": 65,
+     "cents": -1,
+     "file": "harp/65.opus"
+    },
+    {
+     "root": 69,
+     "cents": -9,
+     "file": "harp/69.opus"
+    },
+    {
+     "root": 72,
+     "cents": -11,
+     "file": "harp/72.opus"
+    },
+    {
+     "root": 76,
+     "cents": -11,
+     "file": "harp/76.opus"
+    },
+    {
+     "root": 79,
+     "cents": -5,
+     "file": "harp/79.opus"
+    },
+    {
+     "root": 83,
+     "cents": -7,
+     "file": "harp/83.opus"
+    },
+    {
+     "root": 86,
+     "cents": -5,
+     "file": "harp/86.opus"
+    },
+    {
+     "root": 89,
+     "cents": -3,
+     "file": "harp/89.opus"
+    },
+    {
+     "root": 93,
+     "cents": -14,
+     "file": "harp/93.opus"
+    }
+   ]
+  },
+  {
+   "id": "kalimba",
+   "name": "Kalimba",
+   "group": "Mallets",
+   "release": 0.25,
+   "sustain": false,
+   "zones": [
+    {
+     "root": 59,
+     "cents": 5,
+     "file": "kalimba/59.opus"
+    },
+    {
+     "root": 63,
+     "cents": 6,
+     "file": "kalimba/63.opus"
+    },
+    {
+     "root": 66,
+     "cents": 33,
+     "file": "kalimba/66.opus"
+    },
+    {
+     "root": 71,
+     "cents": 10,
+     "file": "kalimba/71.opus"
+    },
+    {
+     "root": 78,
+     "cents": 37,
+     "file": "kalimba/78.opus"
+    }
+   ]
+  },
+  {
+   "id": "strings",
+   "name": "Strings",
+   "group": "Strings",
+   "release": 0.3,
+   "sustain": true,
+   "zones": [
+    {
+     "root": 55,
+     "cents": 1,
+     "file": "strings/55.opus"
+    },
+    {
+     "root": 59,
+     "cents": 1,
+     "file": "strings/59.opus"
+    },
+    {
+     "root": 62,
+     "cents": 1,
+     "file": "strings/62.opus"
+    },
+    {
+     "root": 66,
+     "cents": 4,
+     "file": "strings/66.opus"
+    },
+    {
+     "root": 69,
+     "cents": 1,
+     "file": "strings/69.opus"
+    },
+    {
+     "root": 72,
+     "cents": 1,
+     "file": "strings/72.opus"
+    },
+    {
+     "root": 76,
+     "cents": 2,
+     "file": "strings/76.opus"
+    },
+    {
+     "root": 79,
+     "cents": 1,
+     "file": "strings/79.opus"
+    },
+    {
+     "root": 83,
+     "cents": 4,
+     "file": "strings/83.opus"
+    },
+    {
+     "root": 86,
+     "cents": 2,
+     "file": "strings/86.opus"
+    }
+   ]
+  },
+  {
+   "id": "cello",
+   "name": "Cello",
+   "group": "Strings",
+   "release": 0.3,
+   "sustain": true,
+   "zones": [
+    {
+     "root": 36,
+     "cents": 2,
+     "file": "cello/36.opus"
+    },
+    {
+     "root": 40,
+     "cents": -1,
+     "file": "cello/40.opus"
+    },
+    {
+     "root": 43,
+     "cents": -2,
+     "file": "cello/43.opus"
+    },
+    {
+     "root": 47,
+     "cents": 3,
+     "file": "cello/47.opus"
+    },
+    {
+     "root": 50,
+     "cents": 5,
+     "file": "cello/50.opus"
+    },
+    {
+     "root": 53,
+     "cents": 4,
+     "file": "cello/53.opus"
+    },
+    {
+     "root": 57,
+     "cents": -1,
+     "file": "cello/57.opus"
+    },
+    {
+     "root": 60,
+     "cents": 2,
+     "file": "cello/60.opus"
+    },
+    {
+     "root": 64,
+     "cents": -3,
+     "file": "cello/64.opus"
+    },
+    {
+     "root": 67,
+     "cents": 5,
+     "file": "cello/67.opus"
+    },
+    {
+     "root": 71,
+     "cents": 1,
+     "file": "cello/71.opus"
+    },
+    {
+     "root": 74,
+     "cents": 1,
+     "file": "cello/74.opus"
+    },
+    {
+     "root": 77,
+     "cents": 1,
+     "file": "cello/77.opus"
+    }
+   ]
+  },
+  {
+   "id": "flute",
+   "name": "Flute",
+   "group": "Winds",
+   "release": 0.2,
+   "sustain": true,
+   "zones": [
+    {
+     "root": 60,
+     "cents": -9,
+     "file": "flute/60.opus"
+    },
+    {
+     "root": 64,
+     "cents": -2,
+     "file": "flute/64.opus"
+    },
+    {
+     "root": 69,
+     "cents": 0,
+     "file": "flute/69.opus"
+    },
+    {
+     "root": 72,
+     "cents": 3,
+     "file": "flute/72.opus"
+    },
+    {
+     "root": 76,
+     "cents": 1,
+     "file": "flute/76.opus"
+    },
+    {
+     "root": 81,
+     "cents": 2,
+     "file": "flute/81.opus"
+    },
+    {
+     "root": 84,
+     "cents": 3,
+     "file": "flute/84.opus"
+    },
+    {
+     "root": 88,
+     "cents": 2,
+     "file": "flute/88.opus"
+    },
+    {
+     "root": 93,
+     "cents": 1,
+     "file": "flute/93.opus"
+    },
+    {
+     "root": 96,
+     "cents": -1,
+     "file": "flute/96.opus"
+    }
+   ]
+  },
+  {
+   "id": "trumpet",
+   "name": "Trumpet",
+   "group": "Brass",
+   "release": 0.15,
+   "sustain": true,
+   "zones": [
+    {
+     "root": 53,
+     "cents": 4,
+     "file": "trumpet/53.opus"
+    },
+    {
+     "root": 57,
+     "cents": -2,
+     "file": "trumpet/57.opus"
+    },
+    {
+     "root": 60,
+     "cents": -11,
+     "file": "trumpet/60.opus"
+    },
+    {
+     "root": 63,
+     "cents": 0,
+     "file": "trumpet/63.opus"
+    },
+    {
+     "root": 67,
+     "cents": 8,
+     "file": "trumpet/67.opus"
+    },
+    {
+     "root": 70,
+     "cents": 1,
+     "file": "trumpet/70.opus"
+    },
+    {
+     "root": 74,
+     "cents": -1,
+     "file": "trumpet/74.opus"
+    },
+    {
+     "root": 77,
+     "cents": 6,
+     "file": "trumpet/77.opus"
+    },
+    {
+     "root": 81,
+     "cents": 0,
+     "file": "trumpet/81.opus"
+    },
+    {
+     "root": 84,
+     "cents": 2,
+     "file": "trumpet/84.opus"
+    }
+   ]
+  },
+  {
+   "id": "sax",
+   "name": "Tenor Sax",
+   "group": "Winds",
+   "release": 0.15,
+   "sustain": true,
+   "zones": [
+    {
+     "root": 44,
+     "cents": 1,
+     "file": "sax/44.opus"
+    },
+    {
+     "root": 48,
+     "cents": 0,
+     "file": "sax/48.opus"
+    },
+    {
+     "root": 52,
+     "cents": 0,
+     "file": "sax/52.opus"
+    },
+    {
+     "root": 56,
+     "cents": 0,
+     "file": "sax/56.opus"
+    },
+    {
+     "root": 60,
+     "cents": 4,
+     "file": "sax/60.opus"
+    },
+    {
+     "root": 64,
+     "cents": 0,
+     "file": "sax/64.opus"
+    },
+    {
+     "root": 68,
+     "cents": 1,
+     "file": "sax/68.opus"
+    },
+    {
+     "root": 72,
+     "cents": 1,
+     "file": "sax/72.opus"
+    },
+    {
+     "root": 76,
+     "cents": 1,
+     "file": "sax/76.opus"
+    },
+    {
+     "root": 80,
+     "cents": 0,
+     "file": "sax/80.opus"
+    },
+    {
+     "root": 84,
+     "cents": 2,
+     "file": "sax/84.opus"
+    },
+    {
+     "root": 88,
+     "cents": -2,
+     "file": "sax/88.opus"
+    }
+   ]
+  },
+  {
+   "id": "bass",
+   "name": "Upright Bass",
+   "group": "Plucked",
+   "release": 0.15,
+   "sustain": false,
+   "zones": [
+    {
+     "root": 28,
+     "cents": -3,
+     "file": "bass/28.opus"
+    },
+    {
+     "root": 34,
+     "cents": 3,
+     "file": "bass/34.opus"
+    },
+    {
+     "root": 38,
+     "cents": 7,
+     "file": "bass/38.opus"
+    },
+    {
+     "root": 42,
+     "cents": 24,
+     "file": "bass/42.opus"
+    },
+    {
+     "root": 45,
+     "cents": 22,
+     "file": "bass/45.opus"
+    },
+    {
+     "root": 49,
+     "cents": 3,
+     "file": "bass/49.opus"
+    },
+    {
+     "root": 52,
+     "cents": 2,
+     "file": "bass/52.opus"
+    },
+    {
+     "root": 56,
+     "cents": -30,
+     "file": "bass/56.opus"
+    },
+    {
+     "root": 59,
+     "cents": -16,
+     "file": "bass/59.opus"
+    }
+   ]
+  },
+  {
+   "id": "grand",
+   "name": "Grand Piano",
+   "group": "Keys",
+   "release": 0.35,
+   "sustain": false,
+   "zones": [
+    {
+     "root": 26,
+     "cents": 3,
+     "file": "grand/26.opus"
+    },
+    {
+     "root": 30,
+     "cents": 10,
+     "file": "grand/30.opus"
+    },
+    {
+     "root": 34,
+     "cents": 11,
+     "file": "grand/34.opus"
+    },
+    {
+     "root": 38,
+     "cents": -2,
+     "file": "grand/38.opus"
+    },
+    {
+     "root": 42,
+     "cents": 5,
+     "file": "grand/42.opus"
+    },
+    {
+     "root": 46,
+     "cents": -1,
+     "file": "grand/46.opus"
+    },
+    {
+     "root": 50,
+     "cents": 2,
+     "file": "grand/50.opus"
+    },
+    {
+     "root": 54,
+     "cents": 3,
+     "file": "grand/54.opus"
+    },
+    {
+     "root": 58,
+     "cents": 10,
+     "file": "grand/58.opus"
+    },
+    {
+     "root": 62,
+     "cents": 1,
+     "file": "grand/62.opus"
+    },
+    {
+     "root": 66,
+     "cents": 4,
+     "file": "grand/66.opus"
+    },
+    {
+     "root": 70,
+     "cents": 3,
+     "file": "grand/70.opus"
+    },
+    {
+     "root": 74,
+     "cents": 2,
+     "file": "grand/74.opus"
+    },
+    {
+     "root": 78,
+     "cents": 1,
+     "file": "grand/78.opus"
+    },
+    {
+     "root": 82,
+     "cents": 4,
+     "file": "grand/82.opus"
+    },
+    {
+     "root": 86,
+     "cents": 6,
+     "file": "grand/86.opus"
+    },
+    {
+     "root": 90,
+     "cents": 1,
+     "file": "grand/90.opus"
+    },
+    {
+     "root": 94,
+     "cents": 0,
+     "file": "grand/94.opus"
+    },
+    {
+     "root": 98,
+     "cents": 12,
+     "file": "grand/98.opus"
+    },
+    {
+     "root": 102,
+     "cents": 14,
+     "file": "grand/102.opus"
+    }
+   ]
+  },
+  {
+   "id": "epiano",
+   "name": "Electric Piano",
+   "group": "Keys",
+   "release": 0.3,
+   "sustain": false,
+   "zones": [
+    {
+     "root": 24,
+     "cents": 2,
+     "file": "epiano/24.opus"
+    },
+    {
+     "root": 28,
+     "cents": 3,
+     "file": "epiano/28.opus"
+    },
+    {
+     "root": 32,
+     "cents": 2,
+     "file": "epiano/32.opus"
+    },
+    {
+     "root": 36,
+     "cents": 2,
+     "file": "epiano/36.opus"
+    },
+    {
+     "root": 40,
+     "cents": 2,
+     "file": "epiano/40.opus"
+    },
+    {
+     "root": 44,
+     "cents": 1,
+     "file": "epiano/44.opus"
+    },
+    {
+     "root": 48,
+     "cents": 1,
+     "file": "epiano/48.opus"
+    },
+    {
+     "root": 52,
+     "cents": 1,
+     "file": "epiano/52.opus"
+    },
+    {
+     "root": 56,
+     "cents": 1,
+     "file": "epiano/56.opus"
+    },
+    {
+     "root": 60,
+     "cents": 1,
+     "file": "epiano/60.opus"
+    },
+    {
+     "root": 64,
+     "cents": 1,
+     "file": "epiano/64.opus"
+    },
+    {
+     "root": 68,
+     "cents": 1,
+     "file": "epiano/68.opus"
+    },
+    {
+     "root": 72,
+     "cents": 1,
+     "file": "epiano/72.opus"
+    },
+    {
+     "root": 76,
+     "cents": 1,
+     "file": "epiano/76.opus"
+    },
+    {
+     "root": 80,
+     "cents": 0,
+     "file": "epiano/80.opus"
+    },
+    {
+     "root": 84,
+     "cents": 3,
+     "file": "epiano/84.opus"
+    },
+    {
+     "root": 88,
+     "cents": -1,
+     "file": "epiano/88.opus"
+    },
+    {
+     "root": 92,
+     "cents": 8,
+     "file": "epiano/92.opus"
+    },
+    {
+     "root": 96,
+     "cents": 0,
+     "file": "epiano/96.opus"
+    }
+   ]
+  },
+  {
+   "id": "organ",
+   "name": "Church Organ",
+   "group": "Keys",
+   "release": 0.25,
+   "sustain": true,
+   "zones": [
+    {
+     "root": 36,
+     "cents": 3,
+     "file": "organ/36.opus"
+    },
+    {
+     "root": 39,
+     "cents": 1,
+     "file": "organ/39.opus"
+    },
+    {
+     "root": 42,
+     "cents": 2,
+     "file": "organ/42.opus"
+    },
+    {
+     "root": 45,
+     "cents": -1,
+     "file": "organ/45.opus"
+    },
+    {
+     "root": 48,
+     "cents": -4,
+     "file": "organ/48.opus"
+    },
+    {
+     "root": 51,
+     "cents": -3,
+     "file": "organ/51.opus"
+    },
+    {
+     "root": 54,
+     "cents": 0,
+     "file": "organ/54.opus"
+    },
+    {
+     "root": 60,
+     "cents": -1,
+     "file": "organ/60.opus"
+    },
+    {
+     "root": 63,
+     "cents": -2,
+     "file": "organ/63.opus"
+    },
+    {
+     "root": 72,
+     "cents": 1,
+     "file": "organ/72.opus"
+    },
+    {
+     "root": 78,
+     "cents": -1,
+     "file": "organ/78.opus"
+    },
+    {
+     "root": 81,
+     "cents": 0,
+     "file": "organ/81.opus"
+    }
+   ]
+  },
+  {
+   "id": "glock",
+   "name": "Glockenspiel",
+   "group": "Mallets",
+   "release": 0.4,
+   "sustain": false,
+   "zones": [
+    {
+     "root": 79,
+     "cents": -33,
+     "file": "glock/79.opus"
+    },
+    {
+     "root": 84,
+     "cents": 8,
+     "file": "glock/84.opus"
+    },
+    {
+     "root": 91,
+     "cents": 14,
+     "file": "glock/91.opus"
+    },
+    {
+     "root": 96,
+     "cents": 18,
+     "file": "glock/96.opus"
+    },
+    {
+     "root": 103,
+     "cents": 19,
+     "file": "glock/103.opus"
+    },
+    {
+     "root": 108,
+     "cents": 32,
+     "file": "glock/108.opus"
+    }
+   ]
+  },
+  {
+   "id": "chimes",
+   "name": "Tubular Bells",
+   "group": "Mallets",
+   "release": 0.5,
+   "sustain": false,
+   "zones": [
+    {
+     "root": 50,
+     "cents": 0,
+     "file": "chimes/50.opus"
+    },
+    {
+     "root": 56,
+     "cents": 0,
+     "file": "chimes/56.opus"
+    },
+    {
+     "root": 60,
+     "cents": 0,
+     "file": "chimes/60.opus"
+    },
+    {
+     "root": 64,
+     "cents": 0,
+     "file": "chimes/64.opus"
+    }
+   ]
+  },
+  {
+   "id": "strum",
+   "name": "Strumstick",
+   "group": "Plucked",
+   "release": 0.25,
+   "sustain": false,
+   "zones": [
+    {
+     "root": 50,
+     "cents": 4,
+     "file": "strum/50.opus"
+    },
+    {
+     "root": 54,
+     "cents": 2,
+     "file": "strum/54.opus"
+    },
+    {
+     "root": 57,
+     "cents": 2,
+     "file": "strum/57.opus"
+    },
+    {
+     "root": 61,
+     "cents": 4,
+     "file": "strum/61.opus"
+    },
+    {
+     "root": 64,
+     "cents": -2,
+     "file": "strum/64.opus"
+    },
+    {
+     "root": 67,
+     "cents": 2,
+     "file": "strum/67.opus"
+    },
+    {
+     "root": 71,
+     "cents": 0,
+     "file": "strum/71.opus"
+    },
+    {
+     "root": 74,
+     "cents": 1,
+     "file": "strum/74.opus"
+    },
+    {
+     "root": 78,
+     "cents": 2,
+     "file": "strum/78.opus"
+    },
+    {
+     "root": 81,
+     "cents": -1,
+     "file": "strum/81.opus"
+    }
+   ]
+  },
+  {
+   "id": "pizz",
+   "name": "Plucked Strings",
+   "group": "Plucked",
+   "release": 0.15,
+   "sustain": false,
+   "zones": [
+    {
+     "root": 55,
+     "cents": 10,
+     "file": "pizz/55.opus"
+    },
+    {
+     "root": 59,
+     "cents": -2,
+     "file": "pizz/59.opus"
+    },
+    {
+     "root": 62,
+     "cents": 5,
+     "file": "pizz/62.opus"
+    },
+    {
+     "root": 66,
+     "cents": 2,
+     "file": "pizz/66.opus"
+    },
+    {
+     "root": 69,
+     "cents": 0,
+     "file": "pizz/69.opus"
+    },
+    {
+     "root": 72,
+     "cents": -14,
+     "file": "pizz/72.opus"
+    },
+    {
+     "root": 76,
+     "cents": -13,
+     "file": "pizz/76.opus"
+    },
+    {
+     "root": 79,
+     "cents": -1,
+     "file": "pizz/79.opus"
+    },
+    {
+     "root": 83,
+     "cents": -3,
+     "file": "pizz/83.opus"
+    }
+   ]
+  },
+  {
+   "id": "viola",
+   "name": "Violas",
+   "group": "Strings",
+   "release": 0.3,
+   "sustain": true,
+   "zones": [
+    {
+     "root": 48,
+     "cents": -2,
+     "file": "viola/48.opus"
+    },
+    {
+     "root": 52,
+     "cents": 2,
+     "file": "viola/52.opus"
+    },
+    {
+     "root": 55,
+     "cents": -1,
+     "file": "viola/55.opus"
+    },
+    {
+     "root": 59,
+     "cents": 2,
+     "file": "viola/59.opus"
+    },
+    {
+     "root": 62,
+     "cents": -1,
+     "file": "viola/62.opus"
+    },
+    {
+     "root": 65,
+     "cents": -1,
+     "file": "viola/65.opus"
+    },
+    {
+     "root": 69,
+     "cents": 0,
+     "file": "viola/69.opus"
+    },
+    {
+     "root": 72,
+     "cents": -1,
+     "file": "viola/72.opus"
+    },
+    {
+     "root": 76,
+     "cents": -1,
+     "file": "viola/76.opus"
+    },
+    {
+     "root": 79,
+     "cents": 2,
+     "file": "viola/79.opus"
+    },
+    {
+     "root": 83,
+     "cents": 4,
+     "file": "viola/83.opus"
+    },
+    {
+     "root": 86,
+     "cents": 3,
+     "file": "viola/86.opus"
+    }
+   ]
+  },
+  {
+   "id": "clarinet",
+   "name": "Clarinet",
+   "group": "Winds",
+   "release": 0.15,
+   "sustain": true,
+   "zones": [
+    {
+     "root": 50,
+     "cents": 4,
+     "file": "clarinet/50.opus"
+    },
+    {
+     "root": 53,
+     "cents": 2,
+     "file": "clarinet/53.opus"
+    },
+    {
+     "root": 58,
+     "cents": 0,
+     "file": "clarinet/58.opus"
+    },
+    {
+     "root": 62,
+     "cents": 3,
+     "file": "clarinet/62.opus"
+    },
+    {
+     "root": 65,
+     "cents": 5,
+     "file": "clarinet/65.opus"
+    },
+    {
+     "root": 70,
+     "cents": 3,
+     "file": "clarinet/70.opus"
+    },
+    {
+     "root": 74,
+     "cents": 4,
+     "file": "clarinet/74.opus"
+    },
+    {
+     "root": 77,
+     "cents": 7,
+     "file": "clarinet/77.opus"
+    },
+    {
+     "root": 82,
+     "cents": 5,
+     "file": "clarinet/82.opus"
+    },
+    {
+     "root": 86,
+     "cents": 7,
+     "file": "clarinet/86.opus"
+    }
+   ]
+  },
+  {
+   "id": "oboe",
+   "name": "Oboe",
+   "group": "Winds",
+   "release": 0.15,
+   "sustain": true,
+   "zones": [
+    {
+     "root": 58,
+     "cents": 3,
+     "file": "oboe/58.opus"
+    },
+    {
+     "root": 62,
+     "cents": -3,
+     "file": "oboe/62.opus"
+    },
+    {
+     "root": 65,
+     "cents": -2,
+     "file": "oboe/65.opus"
+    },
+    {
+     "root": 70,
+     "cents": -1,
+     "file": "oboe/70.opus"
+    },
+    {
+     "root": 74,
+     "cents": 1,
+     "file": "oboe/74.opus"
+    },
+    {
+     "root": 77,
+     "cents": 9,
+     "file": "oboe/77.opus"
+    },
+    {
+     "root": 82,
+     "cents": 0,
+     "file": "oboe/82.opus"
+    },
+    {
+     "root": 86,
+     "cents": 1,
+     "file": "oboe/86.opus"
+    },
+    {
+     "root": 89,
+     "cents": 1,
+     "file": "oboe/89.opus"
+    }
+   ]
+  },
+  {
+   "id": "horn",
+   "name": "French Horn",
+   "group": "Brass",
+   "release": 0.2,
+   "sustain": true,
+   "zones": [
+    {
+     "root": 33,
+     "cents": -7,
+     "file": "horn/33.opus"
+    },
+    {
+     "root": 36,
+     "cents": -1,
+     "file": "horn/36.opus"
+    },
+    {
+     "root": 39,
+     "cents": -6,
+     "file": "horn/39.opus"
+    },
+    {
+     "root": 43,
+     "cents": 7,
+     "file": "horn/43.opus"
+    },
+    {
+     "root": 46,
+     "cents": 4,
+     "file": "horn/46.opus"
+    },
+    {
+     "root": 50,
+     "cents": 4,
+     "file": "horn/50.opus"
+    },
+    {
+     "root": 53,
+     "cents": -4,
+     "file": "horn/53.opus"
+    },
+    {
+     "root": 57,
+     "cents": -3,
+     "file": "horn/57.opus"
+    },
+    {
+     "root": 60,
+     "cents": -1,
+     "file": "horn/60.opus"
+    },
+    {
+     "root": 74,
+     "cents": 5,
+     "file": "horn/74.opus"
+    },
+    {
+     "root": 77,
+     "cents": 2,
+     "file": "horn/77.opus"
+    }
+   ]
+  },
+  {
+   "id": "trombone",
+   "name": "Trombone",
+   "group": "Brass",
+   "release": 0.15,
+   "sustain": true,
+   "zones": [
+    {
+     "root": 34,
+     "cents": 0,
+     "file": "trombone/34.opus"
+    },
+    {
+     "root": 37,
+     "cents": 0,
+     "file": "trombone/37.opus"
+    },
+    {
+     "root": 41,
+     "cents": 0,
+     "file": "trombone/41.opus"
+    },
+    {
+     "root": 46,
+     "cents": -1,
+     "file": "trombone/46.opus"
+    },
+    {
+     "root": 50,
+     "cents": 0,
+     "file": "trombone/50.opus"
+    },
+    {
+     "root": 53,
+     "cents": 0,
+     "file": "trombone/53.opus"
+    },
+    {
+     "root": 60,
+     "cents": 0,
+     "file": "trombone/60.opus"
+    },
+    {
+     "root": 63,
+     "cents": 0,
+     "file": "trombone/63.opus"
+    }
+   ]
+  }
+ ],
+ "drums": [
+  {
+   "id": "kick",
+   "name": "Kick",
+   "file": "drums/kick.opus"
+  },
+  {
+   "id": "snare",
+   "name": "Snare",
+   "file": "drums/snare.opus"
+  },
+  {
+   "id": "hat",
+   "name": "Hi-hat",
+   "file": "drums/hat.opus"
+  },
+  {
+   "id": "openhat",
+   "name": "Open hat",
+   "file": "drums/openhat.opus"
+  },
+  {
+   "id": "clap",
+   "name": "Clap",
+   "file": "drums/clap.opus"
+  },
+  {
+   "id": "shaker",
+   "name": "Shaker",
+   "file": "drums/shaker.opus"
+  },
+  {
+   "id": "tom",
+   "name": "Tom",
+   "file": "drums/tom.opus"
+  },
+  {
+   "id": "conga",
+   "name": "Conga",
+   "file": "drums/conga.opus"
+  },
+  {
+   "id": "tamb",
+   "name": "Tambourine",
+   "file": "drums/tamb.opus"
+  },
+  {
+   "id": "cowbell",
+   "name": "Cowbell",
+   "file": "drums/cowbell.opus"
+  },
+  {
+   "id": "crash",
+   "name": "Crash",
+   "file": "drums/crash.opus"
+  }
+ ]
+}

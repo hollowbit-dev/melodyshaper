@@ -1,0 +1,81 @@
+{
+  "name": "melodyshaper",
+  "productName": "Melodyshaper",
+  "version": "1.0.0",
+  "description": "Hum a tune and hear it on a real instrument. A free music maker for beginners where nothing sounds wrong, for Mac and Windows.",
+  "main": "src/main.js",
+  "private": true,
+  "author": "Hollowbit Studio",
+  "license": "MIT",
+  "homepage": "https://hollowbit.dev/melodyshaper/",
+  "repository": "github:hollowbit-dev/melodyshaper",
+  "scripts": {
+    "start": "electron .",
+    "test": "node test/theory.mjs && node test/pitch.mjs && node test/features.mjs && node test/e2e.mjs",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:win": "electron-builder --win --publish never",
+    "dist": "electron-builder --mac --win --publish never"
+  },
+  "devDependencies": {
+    "electron": "^33.4.11",
+    "electron-builder": "^25.1.8",
+    "playwright": "1.48",
+    "@breezystack/lamejs": "^1.2.7"
+  },
+  "build": {
+    "appId": "dev.hollowbit.melodyshaper",
+    "productName": "Melodyshaper",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/icon.png",
+      "package.json",
+      "SAMPLES.md"
+    ],
+    "fileAssociations": [
+      {
+        "ext": "melody",
+        "name": "Melodyshaper Song",
+        "role": "Editor"
+      }
+    ],
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "category": "public.app-category.music",
+      "icon": "assets/icon.png",
+      "identity": null,
+      "artifactName": "Melodyshaper-${version}-mac-${arch}.${ext}",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Melodyshaper listens when you press Hum so it can turn your tune into notes. Your voice stays on this computer."
+      }
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "Melodyshaper-Setup-${version}-win-x64.exe"
+    },
+    "afterPack": "scripts/after-pack.js"
+  }
+}
