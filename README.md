@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <a href="https://hollowbit.dev/melodyshaper/"><img src="https://img.shields.io/badge/Download-Free-111?style=for-the-badge" alt="Download Melodyshaper for free"></a>
+  <a href="https://hollowbit.dev/melodyshaper/"><img src="https://img.shields.io/badge/Download-Free-2563eb?style=for-the-badge" alt="Download Melodyshaper for free"></a>
 </p>
 
 <p align="center"><img src="screenshots/melodyshaper-app.png" width="880" alt="Melodyshaper with a hummed melody, chords, bass and drums"></p>
